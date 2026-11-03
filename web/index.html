@@ -1,54 +1,825 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bee Guardian 2.0 | Live Hive Monitoring</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Bee Guardian · Hive 01</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2l12 7v14l-12 7-12-7V9z' fill='%23E8A317'/%3E%3Cpath d='M16 9l6 3.5v7L16 23l-6-3.5v-7z' fill='%231C1B19'/%3E%3C/svg%3E">
 <style>
-:root{color-scheme:light;--bg:#f5f7fb;--panel:#ffffff;--line:#dfe6ef;--text:#1a2a3a;--muted:#64748b;--gold:#bb791d;--cyan:#087c9c;--red:#cb3949;--green:#14845f}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#e6f1fa 0%,transparent 43%),var(--bg);color:var(--text);font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}main{max-width:1220px;margin:auto;padding:28px 24px 55px}.top{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:27px}.brand{display:flex;gap:13px;align-items:center}.logo{height:46px;width:46px;display:grid;place-items:center;border-radius:15px;background:#ffda85;color:#61420d;font-size:28px}h1{font-size:25px;line-height:1.1;margin:0;font-weight:760;letter-spacing:-.5px}.sub{color:var(--muted);font-size:13px;margin-top:5px}.connection{display:flex;align-items:center;gap:9px;color:var(--muted);padding:10px 15px;border:1px solid var(--line);border-radius:40px;background:#fff;font-size:13px}.dot{width:9px;height:9px;border-radius:50%;background:#e5a14d}.dot.online{background:var(--green);box-shadow:0 0 10px #67dcae77}.hero{padding:22px 24px;border:1px solid var(--line);border-radius:19px;background:linear-gradient(115deg,#ffffff,#eef7fc 85%);display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}.eyebrow{text-transform:uppercase;letter-spacing:1.6px;font-size:11px;color:var(--muted);font-weight:700}.hero h2{font-size:23px;margin:5px 0 0}.hero p{margin:5px 0 0;font-size:13px;color:var(--muted)}.hero-state{font-size:12px;font-weight:700;color:var(--green);background:#67dcae18;border:1px solid #67dcae44;border-radius:50px;padding:9px 14px;white-space:nowrap}.hero-state.alert{color:#b44c24;background:#fff0df;border-color:#f7c499}.hero-state.offline{color:var(--muted);background:#f1f5f9;border-color:#dce3eb}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:17px}.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;min-width:0}.metric-head{display:flex;align-items:center;justify-content:space-between}.label{font-size:13px;color:var(--muted)}.symbol{font-size:20px;color:var(--gold)}.value{font-size:43px;font-weight:740;letter-spacing:-1.6px;line-height:1.4;font-variant-numeric:tabular-nums}.unit{font-size:19px;color:var(--muted);font-weight:500}.small{font-size:12px;color:var(--muted);margin-top:8px}.tag{display:inline-block;margin-top:13px;border:1px solid var(--line);border-radius:8px;padding:5px 9px;font-size:12px;color:var(--muted)}.tag.active{color:#aa2939;border-color:#efadba;background:#fff1f3}.layout{display:grid;grid-template-columns:1.8fr 1fr;gap:17px;margin-top:17px}.charts{display:grid;grid-template-rows:auto auto;gap:17px}.chart-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.chart-title b,.settings h3{font-size:15px}.chart-title span{color:var(--muted);font-size:12px}canvas{width:100%;height:185px;display:block}.setting{margin:22px 0}.setting-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}.setting-heading label{color:var(--muted);font-size:13px}.setting-heading strong{font-size:19px;font-variant-numeric:tabular-nums}.range{width:100%;accent-color:var(--gold);margin-top:13px;cursor:pointer}.bounds{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}button{width:100%;padding:13px;border:0;border-radius:11px;color:#201a12;font-size:14px;font-weight:760;background:var(--gold);cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.notice{color:var(--muted);font-size:12px;margin-top:13px;min-height:35px}.minihead{font-size:15px;margin:22px 0 12px}.event{font-size:12px;border-top:1px solid var(--line);padding:10px 0;display:flex;gap:10px;justify-content:space-between}.event time{color:var(--muted);white-space:nowrap}.footer{font-size:12px;color:var(--muted);padding:24px 3px;display:flex;gap:15px;justify-content:space-between} .validwarn{color:#ac4f20} @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}}@media(max-width:540px){main{padding:20px 13px}.grid{grid-template-columns:1fr}.top,.hero{align-items:flex-start;flex-direction:column}.value{font-size:39px}.footer{flex-direction:column}}
+/* ───────────────────────── Design tokens ───────────────────────── */
+:root{
+  --font: "Inter var", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
 
-/* Light-theme polish: clear hierarchy, tactile controls, accessible focus */
-.panel{box-shadow:0 4px 18px rgba(23,43,77,.045)}
-.hero{box-shadow:0 6px 24px rgba(30,73,105,.045)}
-.logo{box-shadow:inset 0 0 0 1px #efc56d}
-.connection{box-shadow:0 2px 8px rgba(20,35,55,.035)}
-button{color:#ffffff;background:#a96b10;transition:background .2s,transform .2s}
-button:hover:not(:disabled){background:#85520b;transform:translateY(-1px)}
-button:focus-visible,input:focus-visible{outline:3px solid #74b6d8;outline-offset:3px}
-.tag.active{font-weight:600}
-.range{accent-color:#a96b10}
-::selection{background:#ffdf9d;color:#202b38}
+  --bg:#F6F5F2; --surface:#FFFFFF; --surface-2:#FAF9F7; --sunken:#F1EFEB;
+  --border:#E6E3DD; --border-strong:#D5D1C9;
+  --text:#1B1A18; --text-2:#5C5850; --text-3:#8D887F;
+  --accent:#E8A317; --accent-ink:#8A5A00; --accent-soft:#FDF3DC; --on-accent:#1B1A18;
+  --ok:#15803D; --ok-soft:#E8F5EC;
+  --warn:#B45309; --warn-soft:#FDF0E1;
+  --danger:#C8322B; --danger-soft:#FCEBEA;
+  --temp:#D9850B; --hum:#2F6FDB; --vib:#0E8A7E; --z:#7A5AD9;
+  --grid:#EEECE7;
+  --shadow-sm:0 1px 0 rgba(28,27,24,.03), 0 1px 2px rgba(28,27,24,.04);
+  --shadow-md:0 1px 2px rgba(28,27,24,.04), 0 8px 24px -8px rgba(28,27,24,.10);
+  --ring:0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+  --r-sm:6px; --r-md:10px; --r-lg:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E0E0D; --surface:#161614; --surface-2:#1B1B19; --sunken:#121211;
+    --border:#272623; --border-strong:#34322E;
+    --text:#EEECE8; --text-2:#A6A198; --text-3:#716C64;
+    --accent:#F0B232; --accent-ink:#F5C55E; --accent-soft:#2A2214; --on-accent:#16130C;
+    --ok:#4ADE80; --ok-soft:#13241A; --warn:#F59E0B; --warn-soft:#2A1E0E;
+    --danger:#F87171; --danger-soft:#2C1615;
+    --temp:#F0A43A; --hum:#6B9BF2; --vib:#2DC2B0; --z:#A58BF0; --grid:#22211E;
+    --shadow-sm:0 0 0 1px rgba(0,0,0,.2); --shadow-md:0 12px 32px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E0E0D; --surface:#161614; --surface-2:#1B1B19; --sunken:#121211;
+  --border:#272623; --border-strong:#34322E;
+  --text:#EEECE8; --text-2:#A6A198; --text-3:#716C64;
+  --accent:#F0B232; --accent-ink:#F5C55E; --accent-soft:#2A2214; --on-accent:#16130C;
+  --ok:#4ADE80; --ok-soft:#13241A; --warn:#F59E0B; --warn-soft:#2A1E0E;
+  --danger:#F87171; --danger-soft:#2C1615;
+  --temp:#F0A43A; --hum:#6B9BF2; --vib:#2DC2B0; --z:#A58BF0; --grid:#22211E;
+  --shadow-sm:0 0 0 1px rgba(0,0,0,.2); --shadow-md:0 12px 32px -12px rgba(0,0,0,.6);
+}
+
+/* ───────────────────────── Base ───────────────────────── */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--font);
+  font-feature-settings:"cv11","ss01","ss03";-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,input{font:inherit;color:inherit}
+::selection{background:var(--accent-soft);color:var(--text)}
+:focus-visible{outline:none;box-shadow:var(--ring);border-radius:var(--r-sm)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ───────────────────────── App bar ───────────────────────── */
+.appbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 82%,transparent);
+  backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--border)}
+.appbar-inner{max-width:1320px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.brand svg{flex:none}
+.ver{font:500 11px/1 var(--mono);color:var(--text-3);border:1px solid var(--border);border-radius:5px;padding:3px 5px}
+.crumb{display:flex;align-items:center;gap:8px;color:var(--text-2);font-size:13px;min-width:0}
+.crumb .sep{color:var(--border-strong)}
+.crumb .dim{color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spacer{flex:1}
+.conn{display:flex;align-items:center;gap:8px;height:30px;padding:0 11px 0 10px;border:1px solid var(--border);border-radius:999px;
+  background:var(--surface);font-size:12.5px;color:var(--text-2);box-shadow:var(--shadow-sm);max-width:340px}
+.conn span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pulse{position:relative;width:8px;height:8px;border-radius:50%;background:var(--text-3);flex:none}
+.conn[data-state="online"] .pulse{background:var(--ok)}
+.conn[data-state="online"] .pulse::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1.5px solid var(--ok);opacity:0;animation:ping 2s cubic-bezier(0,0,.2,1) infinite}
+.conn[data-state="error"] .pulse{background:var(--danger)}
+.conn[data-state="demo"] .pulse{background:var(--accent)}
+@keyframes ping{0%{transform:scale(.6);opacity:.7}80%,100%{transform:scale(1.5);opacity:0}}
+.updated{font-size:12px;color:var(--text-3);white-space:nowrap}
+.icon-btn{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--text-2);cursor:pointer}
+.icon-btn:hover{background:var(--sunken);color:var(--text)}
+
+/* ───────────────────────── Layout ───────────────────────── */
+.page{max-width:1320px;margin:0 auto;padding:24px 24px 48px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);min-width:0}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px 0}
+.card-title{font-size:13.5px;font-weight:600;letter-spacing:-.005em;margin:0}
+.card-sub{font-size:12px;color:var(--text-3)}
+.eyebrow{font:500 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)}
+
+/* ───────────────────────── Status band ───────────────────────── */
+.status{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:stretch;padding:20px 22px;margin-bottom:16px;position:relative;overflow:hidden}
+.status::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--text-3)}
+.status[data-state="ok"]::before{background:var(--ok)}
+.status[data-state="alert"]::before{background:var(--danger)}
+.status[data-state="warn"]::before{background:var(--warn)}
+.status-main{display:flex;gap:16px;align-items:flex-start;min-width:0}
+.status-icon{flex:none;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--sunken);color:var(--text-3)}
+.status[data-state="ok"] .status-icon{background:var(--ok-soft);color:var(--ok)}
+.status[data-state="alert"] .status-icon{background:var(--danger-soft);color:var(--danger)}
+.status[data-state="warn"] .status-icon{background:var(--warn-soft);color:var(--warn)}
+.status h1{font-size:20px;line-height:1.25;letter-spacing:-.02em;font-weight:600;margin:6px 0 4px}
+.status p{margin:0;color:var(--text-2);font-size:13.5px;max-width:62ch}
+.outputs{display:grid;grid-template-columns:repeat(3,minmax(112px,auto));border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface-2);overflow:hidden}
+.output{padding:12px 16px;display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:0}
+.output+.output{border-left:1px solid var(--border)}
+.output-val{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;white-space:nowrap}
+.lamp{width:10px;height:10px;border-radius:50%;background:var(--border-strong);box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);flex:none}
+.lamp.on{background:var(--danger);box-shadow:0 0 0 3px color-mix(in srgb,var(--danger) 22%,transparent),0 0 12px color-mix(in srgb,var(--danger) 60%,transparent)}
+.lamp.blink-slow{animation:blink 2s steps(1,end) infinite}
+.lamp.blink-fast{animation:blink .3s steps(1,end) infinite}
+@keyframes blink{0%{opacity:1}50%{opacity:.12}}
+.buzz{display:inline-flex;gap:2px;align-items:center;height:12px}
+.buzz i{width:2px;height:4px;border-radius:1px;background:var(--border-strong)}
+.buzz.on i{background:var(--danger);animation:eq .5s ease-in-out infinite alternate}
+.buzz.on i:nth-child(2){animation-delay:-.15s}.buzz.on i:nth-child(3){animation-delay:-.3s}.buzz.on i:nth-child(4){animation-delay:-.1s}
+@keyframes eq{from{height:3px}to{height:12px}}
+
+/* ───────────────────────── Metric cards ───────────────────────── */
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:16px}
+.metric{padding:16px 18px 14px;display:flex;flex-direction:column;gap:12px;position:relative;transition:border-color .2s}
+.metric[data-alert="true"]{border-color:color-mix(in srgb,var(--danger) 45%,var(--border))}
+.metric-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.metric-label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);font-weight:500}
+.swatch{width:8px;height:8px;border-radius:2px;background:var(--c)}
+.chip{font:500 10.5px/1 var(--mono);color:var(--text-3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;letter-spacing:.02em}
+.metric-value{display:flex;align-items:baseline;gap:6px;line-height:1}
+.metric-value .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:34px;font-weight:500;letter-spacing:-.04em}
+.metric-value .u{font-size:14px;color:var(--text-3);font-weight:500}
+.metric-value .delta{margin-left:auto;font:500 12px/1 var(--mono);color:var(--text-3);white-space:nowrap}
+.spark{width:100%;height:36px;display:block}
+.meter{position:relative;height:6px;border-radius:999px;background:var(--sunken);overflow:visible}
+.meter-fill{position:absolute;left:0;top:0;bottom:0;border-radius:inherit;background:var(--c);width:0;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.meter-band{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--c) 18%,transparent);border-radius:2px}
+.meter-tick{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;border-radius:1px;background:var(--text)}
+.meter-dot{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--surface);border:2px solid var(--c);transition:left .5s cubic-bezier(.2,.8,.2,1)}
+.metric-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--text-3)}
+.badge{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:6px;font-size:11.5px;font-weight:500;white-space:nowrap;
+  background:var(--sunken);color:var(--text-2)}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.9}
+.badge[data-tone="ok"]{background:var(--ok-soft);color:var(--ok)}
+.badge[data-tone="alert"]{background:var(--danger-soft);color:var(--danger)}
+.badge[data-tone="warn"]{background:var(--warn-soft);color:var(--warn)}
+
+/* ───────────────────────── Workspace ───────────────────────── */
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+.side{display:flex;flex-direction:column;gap:16px}
+.chart-card .card-head{padding-bottom:4px}
+.seg{display:inline-flex;padding:3px;gap:2px;background:var(--sunken);border:1px solid var(--border);border-radius:9px}
+.seg button{border:0;background:transparent;padding:5px 11px;border-radius:6px;font-size:12.5px;font-weight:500;color:var(--text-2);cursor:pointer;display:flex;align-items:center;gap:7px}
+.seg button:hover{color:var(--text)}
+.seg button[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm),0 0 0 1px var(--border)}
+.chart-wrap{position:relative;padding:8px 10px 4px 4px}
+#chart{width:100%;height:300px;display:block;cursor:crosshair}
+.tooltip{position:absolute;pointer-events:none;background:var(--text);color:var(--bg);border-radius:8px;padding:7px 10px;font-size:12px;line-height:1.35;
+  box-shadow:var(--shadow-md);opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s;white-space:nowrap}
+.tooltip.show{opacity:1;transform:none}
+.tooltip b{font-family:var(--mono);font-weight:500;font-size:13px}
+.tooltip span{opacity:.65}
+.legend{display:flex;gap:16px;align-items:center;font-size:12px;color:var(--text-3)}
+.legend i{display:inline-block;width:14px;height:2px;border-radius:1px;vertical-align:middle;margin-right:6px;background:var(--c)}
+.legend i.dash{background:repeating-linear-gradient(90deg,var(--text-2) 0 4px,transparent 4px 7px)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border)}
+.stat{padding:12px 18px}
+.stat+.stat{border-left:1px solid var(--border)}
+.stat .eyebrow{display:block;margin-bottom:6px}
+.stat .num{font-size:15px;font-weight:500}
+
+/* ───────────────────────── Controls ───────────────────────── */
+.controls{padding-bottom:16px}
+.field{padding:16px 18px 0}
+.field-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.field-head label{font-size:13px;font-weight:500}
+.field-head small{display:block;font-size:11.5px;color:var(--text-3);font-weight:400;margin-top:1px}
+.stepper{display:flex;align-items:center;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);overflow:hidden}
+.stepper:focus-within{border-color:var(--accent);box-shadow:var(--ring)}
+.stepper button{width:28px;height:100%;border:0;background:transparent;color:var(--text-3);cursor:pointer;font-size:15px;line-height:1}
+.stepper button:hover{background:var(--sunken);color:var(--text)}
+.stepper input{width:54px;height:100%;border:0;background:transparent;text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13px;-moz-appearance:textfield;appearance:textfield}
+.stepper input::-webkit-inner-spin-button,.stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.stepper input:focus{outline:none;box-shadow:none}
+.stepper .unit{padding:0 6px 0 3px;font-size:12px;color:var(--text-3)}
+.range{--p:50%;-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;cursor:pointer;margin:0}
+.range::-webkit-slider-runnable-track{height:4px;border-radius:999px;background:linear-gradient(90deg,var(--text) var(--p),var(--sunken) var(--p))}
+.range::-moz-range-track{height:4px;border-radius:999px;background:linear-gradient(90deg,var(--text) var(--p),var(--sunken) var(--p))}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:var(--surface);border:1px solid var(--border-strong);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.range::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--surface);border:1px solid var(--border-strong);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.range:focus-visible{box-shadow:none}
+.range:focus-visible::-webkit-slider-thumb{box-shadow:var(--ring)}
+.range:focus-visible::-moz-range-thumb{box-shadow:var(--ring)}
+.bounds{display:flex;justify-content:space-between;font:11px/1 var(--mono);color:var(--text-3);margin-top:6px}
+.device-val{font-size:11.5px;color:var(--text-3);margin-top:8px}
+.device-val .num{color:var(--text-2)}
+.actions{display:flex;gap:8px;padding:18px 18px 0}
+.btn{flex:1;height:36px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);background:var(--surface);transition:background .15s,border-color .15s,opacity .15s}
+.btn:hover:not(:disabled){background:var(--sunken)}
+.btn.primary{flex:1.6;background:var(--text);border-color:var(--text);color:var(--bg)}
+.btn.primary:hover:not(:disabled){background:color-mix(in srgb,var(--text) 86%,var(--bg))}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.notice{display:flex;gap:8px;align-items:flex-start;margin:12px 18px 0;font-size:12px;color:var(--text-3);min-height:18px}
+.notice[data-tone="ok"]{color:var(--ok)}.notice[data-tone="alert"]{color:var(--danger)}.notice[data-tone="busy"]{color:var(--text-2)}
+.spinner{width:12px;height:12px;border-radius:50%;border:1.5px solid currentColor;border-right-color:transparent;animation:spin .7s linear infinite;flex:none;margin-top:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dirty-dot{display:none;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-left:6px;vertical-align:middle}
+.is-dirty .dirty-dot{display:inline-block}
+
+/* ───────────────────────── Activity ───────────────────────── */
+.activity{padding-bottom:6px}
+.events{list-style:none;margin:10px 0 0;padding:0 18px;max-height:276px;overflow:auto}
+.events li{display:grid;grid-template-columns:14px 1fr auto;gap:10px;align-items:start;padding:9px 0;position:relative;font-size:12.5px}
+.events li::before{content:"";position:absolute;left:6px;top:24px;bottom:-9px;width:1px;background:var(--border)}
+.events li:last-child::before{display:none}
+.events .ev-dot{width:9px;height:9px;margin:4px 0 0 2px;border-radius:50%;background:var(--surface);border:2px solid var(--text-3);position:relative;z-index:1}
+.events [data-tone="ok"] .ev-dot{border-color:var(--ok)}
+.events [data-tone="alert"] .ev-dot{border-color:var(--danger);background:var(--danger)}
+.events [data-tone="warn"] .ev-dot{border-color:var(--warn)}
+.events [data-tone="info"] .ev-dot{border-color:var(--hum)}
+.events time{font:11.5px/1.6 var(--mono);color:var(--text-3);white-space:nowrap}
+.events .empty{display:block;color:var(--text-3);padding:12px 0 14px;font-size:12.5px}
+.events .empty::before{display:none}
+
+/* ───────────────────────── Footer ───────────────────────── */
+.footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:24px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-3)}
+.footer .row{display:flex;gap:16px;flex-wrap:wrap}
+.footer b{font-weight:500;color:var(--text-2)}
+
+/* ───────────────────────── Responsive ───────────────────────── */
+@media (max-width:1120px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.workspace{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr;align-items:start}}
+@media (max-width:820px){.status{grid-template-columns:1fr}.outputs{grid-template-columns:repeat(3,1fr)}.updated,.crumb{display:none}}
+@media (max-width:640px){
+  .appbar-inner,.page{padding-left:16px;padding-right:16px}
+  .metrics,.side{grid-template-columns:1fr}
+  .metric-value .v{font-size:30px}
+  .chart-card .card-head{flex-direction:column;align-items:flex-start}
+  .stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(3){border-left:0}.stat:nth-child(n+3){border-top:1px solid var(--border)}
+  .outputs{grid-template-columns:1fr 1fr}.output:nth-child(3){grid-column:1/-1;border-left:0;border-top:1px solid var(--border)}
+  #chart{height:240px}
+  .appbar-inner{gap:10px}.ver{display:none}.conn{min-width:0;flex:0 1 auto;max-width:none}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0s!important;animation-iteration-count:1!important;transition:none!important}}
 </style>
 </head>
-<body><main>
-<header class="top"><div class="brand"><div class="logo">⬡</div><div><h1>Bee Guardian <span style="color:var(--gold)">2.0</span></h1><div class="sub">Live beehive monitoring · Arduino Uno</div></div></div><div class="connection"><span id="connDot" class="dot"></span><span id="conn">Connecting to device...</span></div></header>
-<section class="hero"><div><div class="eyebrow">Hive overview</div><h2 id="headline">Awaiting sensor data</h2><p id="description">Connect the Arduino using USB to view live readings.</p></div><div class="hero-state offline" id="heroState">OFFLINE</div></section>
-<section class="grid">
- <article class="panel"><div class="metric-head"><span class="label">Temperature · DHT11</span><span class="symbol">◉</span></div><div class="value"><span id="temp">--</span><span class="unit"> °C</span></div><div class="small">Alert threshold <span id="tlimit">30.0</span>°C</div><div class="tag" id="tempTag">Awaiting data</div></article>
- <article class="panel"><div class="metric-head"><span class="label">Humidity · DHT11</span><span class="symbol" style="color:var(--cyan)">◌</span></div><div class="value"><span id="humidity">--</span><span class="unit"> %</span></div><div class="small">Relative humidity</div><div class="tag" id="humidityTag">Awaiting data</div></article>
- <article class="panel"><div class="metric-head"><span class="label">Vibration · GY-61</span><span class="symbol" style="color:var(--cyan)">〰</span></div><div class="value"><span id="vib">--</span><span class="unit"> counts</span></div><div class="small">Alert threshold <span id="vlimit">35</span> counts</div><div class="tag" id="vibTag">Awaiting data</div></article>
- <article class="panel"><div class="metric-head"><span class="label">Sensor / alarm state</span><span class="symbol">◇</span></div><div class="value" style="font-size:28px;letter-spacing:-.5px;padding:14px 0 7px" id="alarm">Offline</div><div class="small" id="indicator">Buzzer off · LED off</div><div class="tag" id="zTag">Z-axis: --</div></article>
-</section>
-<div class="layout"><div class="charts"><section class="panel"><div class="chart-title"><b>Temperature history</b><span>Recent readings · °C</span></div><canvas id="tempChart"></canvas></section><section class="panel"><div class="chart-title"><b>Vibration history</b><span>Recent swings · ADC counts</span></div><canvas id="vibChart"></canvas></section></div>
-<aside class="panel settings"><div class="eyebrow">Live Arduino controls</div><h3>Alert thresholds</h3><div class="sub">Changes are sent directly to the Uno via USB.</div>
-<div class="setting"><div class="setting-heading"><label for="tempRange">Temperature limit</label><strong id="tempLabel">30.0°C</strong></div><input class="range" id="tempRange" type="range" min="15" max="80" step="0.5" value="30"><div class="bounds"><span>15°C</span><span>80°C</span></div></div>
-<div class="setting"><div class="setting-heading"><label for="vibRange">Vibration sensitivity limit</label><strong id="vibLabel">35</strong></div><input class="range" id="vibRange" type="range" min="1" max="150" step="1" value="35"><div class="bounds"><span>1 (sensitive)</span><span>150 (less sensitive)</span></div></div>
-<button id="apply" disabled>Apply thresholds</button><div id="notice" class="notice">Connect Arduino to enable controls.</div>
-<div class="minihead">Recent events</div><div id="events"><div class="small">No events yet.</div></div></aside></div>
-<footer class="footer"><span>Hardware: DHT11 · GY-61 · buzzer · LED</span><span id="port">USB port: disconnected</span></footer>
+<body>
+
+<header class="appbar">
+  <div class="appbar-inner">
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2l12 7v14l-12 7-12-7V9z" fill="var(--accent)"/><path d="M16 9l6 3.5v7L16 23l-6-3.5v-7z" fill="var(--text)"/></svg>
+      Bee Guardian <span class="ver">2.0</span>
+    </div>
+    <nav class="crumb" aria-label="Location"><span class="sep">/</span><span>Hive 01</span><span class="sep">/</span><span class="dim">Arduino Uno</span></nav>
+    <div class="spacer"></div>
+    <span class="updated" id="updated">—</span>
+    <div class="conn" id="conn" data-state="idle" role="status"><span class="pulse"></span><span id="connText">Connecting…</span></div>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle colour theme" title="Toggle theme">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- System status -->
+  <section class="card status" id="status" data-state="offline" aria-live="polite">
+    <div class="status-main">
+      <div class="status-icon" id="statusIcon" aria-hidden="true"></div>
+      <div>
+        <span class="eyebrow">System status</span>
+        <h1 id="headline">Awaiting sensor data</h1>
+        <p id="description">Connect the Arduino over USB to start streaming live readings.</p>
+      </div>
+    </div>
+    <div class="outputs" aria-label="Device outputs">
+      <div class="output"><span class="eyebrow">Buzzer</span><span class="output-val"><span class="buzz" id="buzz"><i></i><i></i><i></i><i></i></span><span id="buzzText">Off</span></span></div>
+      <div class="output"><span class="eyebrow">LED · D9</span><span class="output-val"><span class="lamp" id="lamp"></span><span id="ledText">Off</span></span></div>
+      <div class="output"><span class="eyebrow">Uptime</span><span class="output-val num" id="uptime">—</span></div>
+    </div>
+  </section>
+
+  <!-- Metrics -->
+  <section class="metrics" aria-label="Live readings">
+    <article class="card metric" id="mTemp" style="--c:var(--temp)">
+      <div class="metric-top"><span class="metric-label"><span class="swatch"></span>Temperature</span><span class="chip">DHT11 · D2</span></div>
+      <div class="metric-value"><span class="v" id="temp">--</span><span class="u">°C</span><span class="delta" id="tempDelta"></span></div>
+      <canvas class="spark" id="sparkTemp" aria-hidden="true"></canvas>
+      <div class="meter" aria-hidden="true"><div class="meter-fill" id="tempFill"></div><div class="meter-tick" id="tempTick"></div></div>
+      <div class="metric-foot"><span>Limit <span class="num" id="tlimit">30.0</span> °C</span><span class="badge" id="tempTag">Awaiting data</span></div>
+    </article>
+
+    <article class="card metric" id="mHum" style="--c:var(--hum)">
+      <div class="metric-top"><span class="metric-label"><span class="swatch"></span>Humidity</span><span class="chip">DHT11 · D2</span></div>
+      <div class="metric-value"><span class="v" id="humidity">--</span><span class="u">% RH</span><span class="delta" id="humDelta"></span></div>
+      <canvas class="spark" id="sparkHum" aria-hidden="true"></canvas>
+      <div class="meter" aria-hidden="true"><div class="meter-band" style="left:50%;width:20%"></div><div class="meter-dot" id="humDot" style="left:0;display:none"></div></div>
+      <div class="metric-foot"><span>Reference <span class="num">50–70</span> %</span><span class="badge" id="humidityTag">Awaiting data</span></div>
+    </article>
+
+    <article class="card metric" id="mVib" style="--c:var(--vib)">
+      <div class="metric-top"><span class="metric-label"><span class="swatch"></span>Vibration</span><span class="chip">GY-61 · A1</span></div>
+      <div class="metric-value"><span class="v" id="vib">--</span><span class="u">counts</span><span class="delta" id="vibDelta"></span></div>
+      <canvas class="spark" id="sparkVib" aria-hidden="true"></canvas>
+      <div class="meter" aria-hidden="true"><div class="meter-fill" id="vibFill"></div><div class="meter-tick" id="vibTick"></div></div>
+      <div class="metric-foot"><span>Limit <span class="num" id="vlimit">35</span> counts</span><span class="badge" id="vibTag">Awaiting data</span></div>
+    </article>
+
+    <article class="card metric" id="mZ" style="--c:var(--z)">
+      <div class="metric-top"><span class="metric-label"><span class="swatch"></span>Z-axis raw</span><span class="chip">ADC 0–1023</span></div>
+      <div class="metric-value"><span class="v" id="z">--</span><span class="u">ADC</span><span class="delta" id="zRange"></span></div>
+      <canvas class="spark" id="sparkZ" aria-hidden="true"></canvas>
+      <div class="meter" aria-hidden="true"><div class="meter-band" id="zBand" style="left:0;width:0"></div><div class="meter-dot" id="zDot" style="left:0;display:none"></div></div>
+      <div class="metric-foot"><span>Window min / max</span><span class="badge" id="zTag">Awaiting data</span></div>
+    </article>
+  </section>
+
+  <!-- Chart + controls -->
+  <div class="workspace">
+    <section class="card chart-card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Telemetry</h2>
+          <div class="card-sub" id="windowLabel">Recent readings</div>
+        </div>
+        <div class="seg" role="tablist" aria-label="Series">
+          <button role="tab" aria-selected="true" data-series="temperature"><span class="swatch" style="--c:var(--temp)"></span>Temperature</button>
+          <button role="tab" aria-selected="false" data-series="humidity"><span class="swatch" style="--c:var(--hum)"></span>Humidity</button>
+          <button role="tab" aria-selected="false" data-series="swing"><span class="swatch" style="--c:var(--vib)"></span>Vibration</button>
+        </div>
+      </div>
+      <div class="card-head" style="padding-top:10px">
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="chart-wrap" id="chartWrap">
+        <canvas id="chart" role="img" aria-label="Telemetry history chart"></canvas>
+        <div class="tooltip" id="tooltip"></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><span class="eyebrow">Current</span><span class="num" id="sCur">—</span></div>
+        <div class="stat"><span class="eyebrow">Min</span><span class="num" id="sMin">—</span></div>
+        <div class="stat"><span class="eyebrow">Average</span><span class="num" id="sAvg">—</span></div>
+        <div class="stat"><span class="eyebrow">Max</span><span class="num" id="sMax">—</span></div>
+      </div>
+    </section>
+
+    <div class="side">
+      <section class="card controls" id="controls">
+        <div class="card-head">
+          <div><h2 class="card-title">Alert thresholds<span class="dirty-dot" title="Unsaved changes"></span></h2><div class="card-sub">Written to the Uno over USB serial</div></div>
+        </div>
+
+        <div class="field">
+          <div class="field-head">
+            <label for="tempRange">Temperature<small>Alarm at or above</small></label>
+            <div class="stepper"><button type="button" data-step="tempRange" data-dir="-1" aria-label="Decrease temperature limit">−</button><input id="tempNum" type="number" min="15" max="80" step="0.5" value="30" aria-label="Temperature limit in °C"><span class="unit">°C</span><button type="button" data-step="tempRange" data-dir="1" aria-label="Increase temperature limit">+</button></div>
+          </div>
+          <input class="range" id="tempRange" type="range" min="15" max="80" step="0.5" value="30">
+          <div class="bounds"><span>15</span><span>80 °C</span></div>
+          <div class="device-val">On device: <span class="num" id="tempDev">—</span></div>
+        </div>
+
+        <div class="field">
+          <div class="field-head">
+            <label for="vibRange">Vibration<small>Lower is more sensitive</small></label>
+            <div class="stepper"><button type="button" data-step="vibRange" data-dir="-1" aria-label="Decrease vibration limit">−</button><input id="vibNum" type="number" min="1" max="150" step="1" value="35" aria-label="Vibration limit in counts"><span class="unit">ct</span><button type="button" data-step="vibRange" data-dir="1" aria-label="Increase vibration limit">+</button></div>
+          </div>
+          <input class="range" id="vibRange" type="range" min="1" max="150" step="1" value="35">
+          <div class="bounds"><span>1</span><span>150 counts</span></div>
+          <div class="device-val">On device: <span class="num" id="vibDev">—</span></div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="revert" type="button" disabled>Revert</button>
+          <button class="btn primary" id="apply" type="button" disabled>Apply to device</button>
+        </div>
+        <div class="notice" id="notice" role="status">Connect the Arduino to enable controls.</div>
+      </section>
+
+      <section class="card activity">
+        <div class="card-head"><h2 class="card-title">Activity</h2><span class="card-sub">This session</span></div>
+        <ul class="events" id="events"><li class="empty">No events yet.</li></ul>
+      </section>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="row"><span><b>Hardware</b> DHT11 · GY-61 · Buzzer D8 · LED D9</span><span id="port">USB: disconnected</span></div>
+    <div class="row"><span>Local only · 127.0.0.1 · no cloud</span><span>Thresholds reset on Arduino reboot</span></div>
+  </footer>
 </main>
+
 <script>
-const $=id=>document.getElementById(id), tempRange=$('tempRange'), vibRange=$('vibRange');
-let connected=false, initialized=false, prevAlert='', recentEvents=[];
-function controlLabels(){ $('tempLabel').textContent=Number(tempRange.value).toFixed(1)+'°C'; $('vibLabel').textContent=vibRange.value; }
-tempRange.addEventListener('input',controlLabels);vibRange.addEventListener('input',controlLabels);
-function eventAdd(message){const t=new Date().toLocaleTimeString();recentEvents.unshift({message,t});recentEvents=recentEvents.slice(0,6);$('events').replaceChildren(...recentEvents.map(e=>{const d=document.createElement('div');d.className='event';const a=document.createElement('span');a.textContent=e.message;const b=document.createElement('time');b.textContent=e.t;d.append(a,b);return d}));}
-function indicator(text,active){const e=$(text);e.classList.toggle('active',!!active);}
-function drawChart(canvasId,points,key,threshold,color){const c=$(canvasId),dpr=window.devicePixelRatio||1,rect=c.getBoundingClientRect();const w=Math.max(250,rect.width),h=185;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);const x=c.getContext('2d');x.scale(dpr,dpr);x.clearRect(0,0,w,h);const pad={l:40,r:10,t:12,b:25};const ww=w-pad.l-pad.r,hh=h-pad.t-pad.b;let vals=points.map(p=>p[key]).filter(v=>typeof v==='number'&&Number.isFinite(v));const lo=Math.max(0,Math.min(threshold,...vals,threshold)*.78),hi=Math.max(threshold+5,...vals,threshold)*1.17||10;const xx=i=>pad.l+i/Math.max(1,points.length-1)*ww, yy=v=>pad.t+(hi-v)/(hi-lo)*hh;x.font='11px system-ui';x.textAlign='right';x.strokeStyle='#e7edf4';x.fillStyle='#718196';x.lineWidth=1;for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,py=yy(v);x.beginPath();x.moveTo(pad.l,py);x.lineTo(w-pad.r,py);x.stroke();x.fillText(v.toFixed(key==='temperature'?0:0),pad.l-8,py+4)}x.setLineDash([5,5]);x.strokeStyle='#c79037';x.beginPath();x.moveTo(pad.l,yy(threshold));x.lineTo(w-pad.r,yy(threshold));x.stroke();x.setLineDash([]);if(points.length>1){x.beginPath();let began=false;points.forEach((p,i)=>{const v=p[key];if(typeof v!=='number'||!Number.isFinite(v))return;const px=xx(i),py=yy(v);if(!began){x.moveTo(px,py);began=true}else x.lineTo(px,py)});x.strokeStyle=color;x.lineWidth=2.7;x.lineJoin='round';x.stroke()}x.fillStyle='#718196';x.textAlign='left';x.fillText('Older',pad.l,h-5);x.textAlign='right';x.fillText('Now',w-pad.r,h-5)}
-async function update(){try{const r=await fetch('/api/status',{cache:'no-store'});if(!r.ok)throw Error('Server unavailable');const s=await r.json();connected=!!s.connected&&!!s.latest&&Date.now()/1000-s.lastSeen<4;$('connDot').classList.toggle('online',connected);$('conn').textContent=connected?'Connected · '+s.port:(s.error||'Arduino disconnected');$('port').textContent='USB port: '+(s.port||'disconnected');$('apply').disabled=!connected;
-if(connected){const d=s.latest, ts=s.settings; if(!initialized){tempRange.value=ts.temperature;vibRange.value=ts.vibration;controlLabels();initialized=true;} $('temp').textContent=d.tempValid&&d.temperature!=null?Number(d.temperature).toFixed(1):'--';$('humidity').textContent=d.tempValid&&d.humidity!=null?Number(d.humidity).toFixed(0):'--';$('humidityTag').textContent=d.tempValid?'Sensor online':'Sensor reading invalid';indicator('humidityTag',!d.tempValid);$('vib').textContent=d.swing;$('tlimit').textContent=Number(ts.temperature).toFixed(1);$('vlimit').textContent=ts.vibration;$('zTag').textContent='Z-axis: '+d.z+' · min '+d.minZ+' / max '+d.maxZ;
-let state=d.tempAlert&&d.vibAlert?'Both alerts':d.tempAlert?'Temperature alert':d.vibAlert?'Vibration alert':'Normal';$('alarm').textContent=state;$('tempTag').textContent=!d.tempValid?'Sensor reading invalid':d.tempAlert?'Above threshold':'Within threshold';$('vibTag').textContent=d.vibAlert?'Vibration detected':'Within threshold';indicator('tempTag',d.tempAlert||!d.tempValid);indicator('vibTag',d.vibAlert);$('headline').textContent=!d.tempValid?'Temperature sensor needs attention':state==='Normal'?'Hive conditions normal':state;$('description').textContent=!d.tempValid?'DHT11 did not provide a valid reading. Check D2, power, ground and any required pull-up resistor.':state==='Normal'?'All monitored values are within your selected thresholds.':'One or more monitored values exceeded your thresholds.';$('heroState').className='hero-state'+(state==='Normal'&&d.tempValid?'': ' alert');$('heroState').textContent=state==='Normal'&&d.tempValid?'MONITORING':'ATTENTION';$('indicator').textContent=d.tempAlert&&d.vibAlert?'Buzzer on · LED solid':d.tempAlert?'Buzzer on · LED slow blink':d.vibAlert?'Buzzer on · LED fast blink':'Buzzer off · LED off';if(state!==prevAlert){eventAdd(state);prevAlert=state;} drawChart('tempChart',s.history.filter(p=>p.tempValid),'temperature',ts.temperature,'#bb791d');drawChart('vibChart',s.history,'swing',ts.vibration,'#087c9c');}
-else{$('headline').textContent='Arduino disconnected';$('description').textContent=s.error||'Connect USB and run the dashboard firmware.';$('heroState').className='hero-state offline';$('heroState').textContent='OFFLINE';$('temp').textContent='--';$('humidity').textContent='--';$('humidityTag').textContent='Awaiting device';indicator('humidityTag',false);$('vib').textContent='--';$('alarm').textContent='Offline';$('indicator').textContent='No live telemetry';$('tempTag').textContent='Awaiting device';$('vibTag').textContent='Awaiting device';$('zTag').textContent='Z-axis: --';indicator('tempTag',false);indicator('vibTag',false);initialized=false;prevAlert='';drawChart('tempChart',[],'temperature',Number(tempRange.value),'#bb791d');drawChart('vibChart',[],'swing',Number(vibRange.value),'#087c9c');}
-}catch(e){connected=false;$('conn').textContent='Dashboard server unavailable';$('connDot').classList.remove('online');$('apply').disabled=true;$('heroState').textContent='OFFLINE';$('heroState').className='hero-state offline';$('headline').textContent='Dashboard server unavailable';$('temp').textContent='--';$('humidity').textContent='--';$('humidityTag').textContent='Awaiting device';} }
-$('apply').addEventListener('click',async()=>{const b=$('apply');b.disabled=true;$('notice').textContent='Sending settings to Arduino...';try{const r=await fetch('/api/thresholds',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({temperature:Number(tempRange.value),vibration:Number(vibRange.value)})});const data=await r.json();if(!r.ok)throw Error(data.error||'Failed');$('notice').textContent='Commands sent. Verifying values from Arduino...';let attempts=0;const targetT=Number(tempRange.value),targetV=Number(vibRange.value);const check=setInterval(async()=>{try{const s=await(await fetch('/api/status')).json();if(Math.abs(s.settings.temperature-targetT)<.11&&s.settings.vibration===targetV){clearInterval(check);$('notice').textContent='Thresholds confirmed by Arduino.';eventAdd('Thresholds updated');}else if(++attempts>=10){clearInterval(check);$('notice').textContent='No confirmation yet; check USB serial connection.';}}catch(e){clearInterval(check);$('notice').textContent='Could not verify settings.'}},500);}catch(e){$('notice').textContent=e.message}finally{b.disabled=!connected}});
-window.addEventListener('resize',()=>{if(!connected){drawChart('tempChart',[],'temperature',Number(tempRange.value),'#bb791d');drawChart('vibChart',[],'swing',Number(vibRange.value),'#087c9c')}});controlLabels();update();setInterval(update,700);
-</script></body></html>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const DEMO = new URLSearchParams(location.search).has('demo');
+const POLL_MS = 700;
+
+/* ── Theme ─────────────────────────────────────────── */
+const root = document.documentElement;
+try { const t = localStorage.getItem('bg-theme'); if (t) root.dataset.theme = t; } catch (e) {}
+const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+$('themeBtn').addEventListener('click', () => {
+  root.dataset.theme = isDark() ? 'light' : 'dark';
+  try { localStorage.setItem('bg-theme', root.dataset.theme); } catch (e) {}
+  redraw();
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', redraw);
+const css = name => getComputedStyle(root).getPropertyValue(name).trim();
+
+/* ── Icons ─────────────────────────────────────────── */
+const ICON = {
+  ok:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V7z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>',
+  alert:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L2.4 17.5A2 2 0 0 0 4.1 20.5h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
+  warn:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>',
+  offline:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7V3M15 7V3M7 7h10v4a5 5 0 0 1-10 0z"/><path d="M12 16v5"/><path d="M3 3l18 18"/></svg>'
+};
+
+/* ── State ─────────────────────────────────────────── */
+let snap = null, connected = false, edited = false, prevState = null, prevConn = null, prevValid = null;
+let series = 'temperature', hoverX = null, events = [];
+const tempRange = $('tempRange'), vibRange = $('vibRange'), tempNum = $('tempNum'), vibNum = $('vibNum');
+
+/* ── Helpers ───────────────────────────────────────── */
+const isNum = v => typeof v === 'number' && Number.isFinite(v);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const fmt = (v, d = 1) => isNum(v) ? v.toFixed(d) : '--';
+const clockTime = d => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+function uptime(ms) {
+  if (!isNum(ms)) return '—';
+  const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60;
+  return h ? `${h}h ${String(m).padStart(2,'0')}m` : `${m}m ${String(ss).padStart(2,'0')}s`;
+}
+function setBadge(el, text, tone) { el.textContent = text; el.dataset.tone = tone || ''; }
+
+const SERIES = {
+  temperature: { label: 'Temperature', unit: '°C', dec: 1, color: '--temp', threshold: () => snap?.settings?.temperature, valid: p => p.tempValid },
+  humidity:    { label: 'Humidity', unit: '% RH', dec: 0, color: '--hum', band: [50, 70], valid: p => p.tempValid },
+  swing:       { label: 'Vibration', unit: 'counts', dec: 0, color: '--vib', threshold: () => snap?.settings?.vibration, valid: () => true },
+  z:           { label: 'Z-axis', unit: 'ADC', dec: 0, color: '--z', valid: () => true }
+};
+function pointsFor(key) {
+  const h = (snap && connected) ? snap.history || [] : [];
+  const cfg = SERIES[key];
+  return h.map(p => ({ t: p.t, v: cfg.valid(p) && isNum(p[key]) ? p[key] : null }));
+}
+
+/* ── Controls ──────────────────────────────────────── */
+function paintRange(r) { r.style.setProperty('--p', ((r.value - r.min) / (r.max - r.min) * 100) + '%'); }
+function syncFromRange() {
+  tempNum.value = Number(tempRange.value).toFixed(1); vibNum.value = vibRange.value;
+  paintRange(tempRange); paintRange(vibRange); updateDirty();
+}
+function setControls(t, v) { tempRange.value = t; vibRange.value = v; syncFromRange(); }
+function isDirty() {
+  if (!snap?.settings) return false;
+  return Math.abs(Number(tempRange.value) - snap.settings.temperature) > .01 || Number(vibRange.value) !== Number(snap.settings.vibration);
+}
+function updateDirty() {
+  const d = connected && isDirty();
+  $('controls').classList.toggle('is-dirty', d);
+  $('revert').disabled = !d;
+  $('apply').disabled = !connected || !d || applying;
+}
+[tempRange, vibRange].forEach(r => r.addEventListener('input', () => { edited = true; syncFromRange(); }));
+[[tempNum, tempRange], [vibNum, vibRange]].forEach(([n, r]) => {
+  n.addEventListener('change', () => {
+    const v = clamp(Number(n.value) || Number(r.min), Number(r.min), Number(r.max));
+    r.value = v; edited = true; syncFromRange();
+  });
+  n.addEventListener('keydown', e => { if (e.key === 'Enter') n.blur(); });
+});
+document.querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
+  const r = $(b.dataset.step);
+  r.value = clamp(Number(r.value) + Number(r.step) * Number(b.dataset.dir), Number(r.min), Number(r.max));
+  edited = true; syncFromRange();
+}));
+$('revert').addEventListener('click', () => {
+  if (snap?.settings) { setControls(snap.settings.temperature, snap.settings.vibration); edited = false; notice('Reverted to device values.'); }
+});
+function notice(text, tone) {
+  const n = $('notice'); n.dataset.tone = tone || '';
+  n.innerHTML = (tone === 'busy' ? '<span class="spinner"></span>' : '') + '<span></span>';
+  n.lastChild.textContent = text;
+}
+
+let applying = false;
+$('apply').addEventListener('click', async () => {
+  const targetT = Number(tempRange.value), targetV = Number(vibRange.value);
+  applying = true; updateDirty(); notice('Sending to Arduino…', 'busy');
+  try {
+    const data = await api.post({ temperature: targetT, vibration: targetV });
+    notice('Sent. Waiting for device confirmation…', 'busy');
+    let attempts = 0;
+    await new Promise((resolve) => {
+      const check = setInterval(async () => {
+        try {
+          const s = await api.status();
+          if (Math.abs(s.settings.temperature - targetT) < .11 && Number(s.settings.vibration) === targetV) {
+            clearInterval(check); edited = false; snap.settings = s.settings;
+            notice(`Confirmed by Arduino · ${targetT.toFixed(1)} °C / ${targetV} counts`, 'ok');
+            addEvent(`Thresholds set to ${targetT.toFixed(1)} °C · ${targetV} counts`, 'info'); resolve();
+          } else if (++attempts >= 10) {
+            clearInterval(check); notice('No confirmation yet — check the USB serial link.', 'alert'); resolve();
+          }
+        } catch (e) { clearInterval(check); notice('Could not verify settings.', 'alert'); resolve(); }
+      }, 500);
+    });
+  } catch (e) { notice(e.message, 'alert'); }
+  finally { applying = false; updateDirty(); }
+});
+
+/* ── Activity log ──────────────────────────────────── */
+function addEvent(message, tone) {
+  events.unshift({ message, tone, t: clockTime(new Date()) });
+  events = events.slice(0, 30);
+  const ul = $('events');
+  ul.replaceChildren(...events.map(e => {
+    const li = document.createElement('li'); li.dataset.tone = e.tone || '';
+    const dot = document.createElement('span'); dot.className = 'ev-dot';
+    const msg = document.createElement('span'); msg.textContent = e.message;
+    const tm = document.createElement('time'); tm.textContent = e.t;
+    li.append(dot, msg, tm); return li;
+  }));
+}
+
+/* ── Canvas charts ─────────────────────────────────── */
+function setupCanvas(c, h) {
+  const dpr = window.devicePixelRatio || 1, w = Math.max(120, c.getBoundingClientRect().width);
+  c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+  const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, w, h);
+  return { x, w, h };
+}
+function extent(vals, extra) {
+  const all = vals.concat(extra.filter(isNum));
+  if (!all.length) return [0, 1];
+  let lo = Math.min(...all), hi = Math.max(...all);
+  const pad = Math.max((hi - lo) * .15, Math.abs(hi) * .02, 1);
+  return [lo - pad, hi + pad];
+}
+function niceTicks(lo, hi, n = 4) {
+  const raw = (hi - lo) / n, mag = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / mag;
+  const step = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag, out = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(6));
+  return out;
+}
+function tracePath(x, pts, X, Y) {
+  let open = false;
+  pts.forEach((p, i) => { if (p.v === null) { open = false; return; } const px = X(i), py = Y(p.v); open ? x.lineTo(px, py) : x.moveTo(px, py); open = true; });
+}
+
+function drawSpark(id, key) {
+  const c = $(id), { x, w, h } = setupCanvas(c, 36), pts = pointsFor(key).slice(-60), cfg = SERIES[key];
+  const vals = pts.map(p => p.v).filter(isNum);
+  const color = css(cfg.color);
+  if (vals.length < 2) {
+    x.strokeStyle = css('--grid'); x.setLineDash([3, 4]); x.beginPath(); x.moveTo(0, h / 2); x.lineTo(w, h / 2); x.stroke(); return;
+  }
+  const [lo, hi] = extent(vals, []);
+  const X = i => i / (pts.length - 1) * (w - 4) + 2, Y = v => 3 + (hi - v) / (hi - lo) * (h - 6);
+  const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, color + '33'); g.addColorStop(1, color + '00');
+  x.beginPath(); tracePath(x, pts, X, Y);
+  x.strokeStyle = color; x.lineWidth = 1.5; x.lineJoin = 'round'; x.stroke();
+  const lastI = pts.map(p => p.v !== null).lastIndexOf(true);
+  if (lastI >= 0) { x.fillStyle = color; x.beginPath(); x.arc(X(lastI), Y(pts[lastI].v), 2.5, 0, 7); x.fill(); }
+}
+
+function drawMain() {
+  const c = $('chart'), H = c.getBoundingClientRect().height || 300;
+  const { x, w, h } = setupCanvas(c, H), cfg = SERIES[series], pts = pointsFor(series);
+  const vals = pts.map(p => p.v).filter(isNum), thr = cfg.threshold?.();
+  const color = css(cfg.color), grid = css('--grid'), muted = css('--text-3'), text = css('--text');
+  const pad = { l: 44, r: 12, t: 14, b: 26 };
+  const [lo, hi] = extent(vals.length ? vals : (isNum(thr) ? [thr] : [0, 10]), [thr, ...(cfg.band || [])]);
+  const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+  const X = i => pad.l + (pts.length > 1 ? i / (pts.length - 1) : 1) * iw, Y = v => pad.t + (hi - v) / (hi - lo) * ih;
+
+  x.font = `11px ${css('--mono')}`; x.textBaseline = 'middle';
+  if (vals.length >= 2) niceTicks(lo, hi).forEach(v => {
+    const py = Math.round(Y(v)) + .5; if (py < pad.t - 2 || py > h - pad.b + 2) return;
+    x.strokeStyle = grid; x.lineWidth = 1; x.beginPath(); x.moveTo(pad.l, py); x.lineTo(w - pad.r, py); x.stroke();
+    x.fillStyle = muted; x.textAlign = 'right'; x.fillText(Number.isInteger(v) ? v : v.toFixed(1), pad.l - 10, py);
+  });
+  if (cfg.band && vals.length >= 2) {
+    const [a, b] = cfg.band; x.fillStyle = color + '14';
+    x.fillRect(pad.l, Y(b), iw, Y(a) - Y(b));
+  }
+  if (isNum(thr) && vals.length >= 2) {
+    const py = Math.round(Y(thr)) + .5;
+    if (py > pad.t) { x.save(); x.globalAlpha = .07; x.fillStyle = css('--danger'); x.fillRect(pad.l, pad.t, iw, py - pad.t); x.restore(); }
+    x.save(); x.setLineDash([4, 4]); x.strokeStyle = css('--text-2'); x.globalAlpha = .7; x.beginPath(); x.moveTo(pad.l, py); x.lineTo(w - pad.r, py); x.stroke(); x.restore();
+    const label = `Limit ${fmt(thr, cfg.dec)}`; x.font = `500 10.5px ${css('--mono')}`;
+    const tw = x.measureText(label).width + 10; x.fillStyle = css('--surface'); x.fillRect(w - pad.r - tw, py - 9, tw, 18);
+    x.strokeStyle = css('--border-strong'); x.strokeRect(w - pad.r - tw + .5, py - 8.5, tw - 1, 17);
+    x.fillStyle = css('--text-2'); x.textAlign = 'center'; x.fillText(label, w - pad.r - tw / 2, py);
+  }
+  // time axis
+  x.font = `11px ${css('--mono')}`; x.fillStyle = muted; x.textBaseline = 'alphabetic';
+  if (pts.length > 1) {
+    const span = pts[pts.length - 1].t - pts[0].t;
+    [0, .5, 1].forEach(f => { x.textAlign = f === 0 ? 'left' : f === 1 ? 'right' : 'center'; x.fillText(f === 1 ? 'now' : `−${Math.round(span * (1 - f))}s`, pad.l + f * iw, h - 6); });
+  }
+
+  if (vals.length < 2) {
+    x.fillStyle = muted; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = `13px ${css('--font')}`;
+    x.fillText(connected ? 'Collecting readings…' : 'No live telemetry', pad.l + iw / 2, pad.t + ih / 2);
+    return;
+  }
+  // area + line
+  const g = x.createLinearGradient(0, pad.t, 0, h - pad.b); g.addColorStop(0, color + '30'); g.addColorStop(1, color + '00');
+  let seg = [];
+  const flush = () => { if (seg.length > 1) { x.beginPath(); x.moveTo(X(seg[0]), h - pad.b); seg.forEach(i => x.lineTo(X(i), Y(pts[i].v))); x.lineTo(X(seg[seg.length - 1]), h - pad.b); x.closePath(); x.fillStyle = g; x.fill(); } seg = []; };
+  pts.forEach((p, i) => p.v === null ? flush() : seg.push(i)); flush();
+  x.beginPath(); tracePath(x, pts, X, Y); x.strokeStyle = color; x.lineWidth = 2; x.lineJoin = 'round'; x.lineCap = 'round'; x.stroke();
+
+  // hover
+  const tip = $('tooltip');
+  if (hoverX !== null && hoverX >= pad.l - 6 && hoverX <= w - pad.r + 6) {
+    const i = clamp(Math.round((hoverX - pad.l) / iw * (pts.length - 1)), 0, pts.length - 1), p = pts[i];
+    const px = X(i);
+    x.strokeStyle = css('--border-strong'); x.lineWidth = 1; x.beginPath(); x.moveTo(Math.round(px) + .5, pad.t); x.lineTo(Math.round(px) + .5, h - pad.b); x.stroke();
+    if (p.v !== null) { x.fillStyle = css('--surface'); x.strokeStyle = color; x.lineWidth = 2; x.beginPath(); x.arc(px, Y(p.v), 4.5, 0, 7); x.fill(); x.stroke(); }
+    tip.innerHTML = `<b></b> <span></span><br><span></span>`;
+    tip.children[0].textContent = p.v === null ? 'Invalid' : fmt(p.v, cfg.dec); tip.children[1].textContent = p.v === null ? '' : cfg.unit;
+    tip.children[3].textContent = clockTime(new Date(p.t * 1000));
+    const tw = tip.offsetWidth, left = px + 14 + tw > w ? px - tw - 14 : px + 14;
+    tip.style.left = (left + 4) + 'px'; tip.style.top = (p.v === null ? pad.t : clamp(Y(p.v) - 46, 0, h - 50)) + 8 + 'px';
+    tip.classList.add('show');
+  } else tip.classList.remove('show');
+}
+
+function renderLegend() {
+  const cfg = SERIES[series], el = $('legend');
+  el.innerHTML = `<span><i style="--c:var(${cfg.color})"></i>${cfg.label} (${cfg.unit})</span>` +
+    (cfg.threshold ? '<span><i class="dash"></i>Alert limit</span>' : '') +
+    (cfg.band ? `<span><i style="--c:var(${cfg.color});height:8px;opacity:.25"></i>Reference band</span>` : '');
+}
+function renderStats() {
+  const cfg = SERIES[series], vals = pointsFor(series).map(p => p.v).filter(isNum), u = ' ' + cfg.unit;
+  const f = v => isNum(v) ? fmt(v, cfg.dec) + u : '—';
+  $('sCur').textContent = f(vals[vals.length - 1]);
+  $('sMin').textContent = f(vals.length ? Math.min(...vals) : null);
+  $('sMax').textContent = f(vals.length ? Math.max(...vals) : null);
+  $('sAvg').textContent = f(vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null);
+  const h = snap?.history || [];
+  $('windowLabel').textContent = connected && h.length > 1 ? `Last ${Math.round(h[h.length - 1].t - h[0].t)} s · ${h.length} samples` : 'Recent readings';
+}
+function redraw() {
+  drawSpark('sparkTemp', 'temperature'); drawSpark('sparkHum', 'humidity'); drawSpark('sparkVib', 'swing'); drawSpark('sparkZ', 'z');
+  drawMain(); renderLegend(); renderStats();
+}
+
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  series = b.dataset.series;
+  document.querySelectorAll('.seg button').forEach(o => o.setAttribute('aria-selected', String(o === b)));
+  redraw();
+}));
+const chart = $('chart');
+chart.addEventListener('pointermove', e => { hoverX = e.clientX - chart.getBoundingClientRect().left; drawMain(); });
+chart.addEventListener('pointerleave', () => { hoverX = null; drawMain(); });
+let rz; window.addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(redraw); });
+
+/* ── Delta (change over ~10 s) ─────────────────────── */
+function delta(key, dec) {
+  const p = pointsFor(key).filter(p => p.v !== null); if (p.length < 4) return '';
+  const now = p[p.length - 1], past = p.find(q => q.t >= now.t - 10) || p[0], d = now.v - past.v;
+  if (Math.abs(d) < Math.pow(10, -dec) / 2) return '±0';
+  return (d > 0 ? '↑ ' : '↓ ') + Math.abs(d).toFixed(dec);
+}
+
+/* ── Main render ───────────────────────────────────── */
+function setStatus(state, headline, description) {
+  const el = $('status'); el.dataset.state = state;
+  $('statusIcon').innerHTML = ICON[state] || ICON.offline;
+  $('headline').textContent = headline; $('description').textContent = description;
+}
+function setOutputs(d) {
+  const buzz = !!(d && (d.tempAlert || d.vibAlert));
+  $('buzz').classList.toggle('on', buzz); $('buzzText').textContent = d ? (buzz ? 'Sounding · 1 kHz' : 'Silent') : 'Off';
+  const lamp = $('lamp'); lamp.className = 'lamp';
+  let led = 'Off';
+  if (d?.tempAlert && d?.vibAlert) { lamp.classList.add('on'); led = 'Solid'; }
+  else if (d?.tempAlert) { lamp.classList.add('on', 'blink-slow'); led = 'Slow blink'; }
+  else if (d?.vibAlert) { lamp.classList.add('on', 'blink-fast'); led = 'Fast blink'; }
+  $('ledText').textContent = led;
+  $('uptime').textContent = d ? uptime(d.ms) : '—';
+}
+function meter(fillId, tickId, value, limit, max) {
+  const scale = Math.max(max, limit * 1.5);
+  $(fillId).style.width = isNum(value) ? clamp(value / scale * 100, 0, 100) + '%' : '0';
+  $(tickId).style.left = clamp(limit / scale * 100, 0, 100) + '%';
+  $(tickId).style.display = '';
+}
+
+function render() {
+  const s = snap;
+  const conn = $('conn');
+  if (!s) { conn.dataset.state = 'error'; $('connText').textContent = 'Dashboard server unavailable'; }
+  else if (connected) { conn.dataset.state = DEMO ? 'demo' : 'online'; $('connText').textContent = DEMO ? 'Demo data · simulated' : `Connected · ${s.port}`; }
+  else { conn.dataset.state = s.connected ? 'idle' : 'error'; $('connText').textContent = s.error || 'Arduino disconnected'; }
+  $('port').textContent = 'USB: ' + (s?.port || 'disconnected');
+  $('updated').textContent = connected && s.lastSeen ? `Updated ${Math.max(0, Date.now() / 1000 - s.lastSeen).toFixed(1)}s ago` : '';
+
+  const connKey = !s ? 'server' : connected ? 'on' : 'off';
+  if (connKey !== prevConn) {
+    if (prevConn !== null || connKey === 'on') addEvent(connKey === 'on' ? (DEMO ? 'Demo stream started' : `Device connected on ${s.port}`) : connKey === 'server' ? 'Dashboard server unreachable' : 'Device disconnected', connKey === 'on' ? 'ok' : 'warn');
+    prevConn = connKey;
+  }
+
+  if (connected) {
+    const d = s.latest, ts = s.settings;
+    if (!edited && !applying && document.activeElement !== tempNum && document.activeElement !== vibNum) setControls(ts.temperature, ts.vibration);
+    $('tempDev').textContent = `${Number(ts.temperature).toFixed(1)} °C`; $('vibDev').textContent = `${ts.vibration} counts`;
+    if ($('notice').textContent.startsWith('Connect')) notice('Adjust a limit, then apply it to the device.');
+
+    // temperature
+    const tv = d.tempValid && isNum(d.temperature);
+    $('temp').textContent = tv ? fmt(d.temperature, 1) : '--';
+    $('tempDelta').textContent = tv ? delta('temperature', 1) : '';
+    $('tlimit').textContent = Number(ts.temperature).toFixed(1);
+    meter('tempFill', 'tempTick', tv ? d.temperature : null, ts.temperature, 50);
+    setBadge($('tempTag'), !d.tempValid ? 'Sensor invalid' : d.tempAlert ? 'Above limit' : 'Normal', !d.tempValid ? 'warn' : d.tempAlert ? 'alert' : 'ok');
+    $('mTemp').dataset.alert = String(!!d.tempAlert);
+
+    // humidity
+    const hv = d.tempValid && isNum(d.humidity);
+    $('humidity').textContent = hv ? fmt(d.humidity, 0) : '--';
+    $('humDelta').textContent = hv ? delta('humidity', 0) : '';
+    const hd = $('humDot'); hd.style.display = hv ? '' : 'none'; if (hv) hd.style.left = clamp(d.humidity, 0, 100) + '%';
+    setBadge($('humidityTag'), !hv ? 'Sensor invalid' : d.humidity < 50 ? 'Below reference' : d.humidity > 70 ? 'Above reference' : 'In range', !hv ? 'warn' : (d.humidity < 50 || d.humidity > 70) ? '' : 'ok');
+
+    // vibration
+    $('vib').textContent = d.swing; $('vibDelta').textContent = delta('swing', 0);
+    $('vlimit').textContent = ts.vibration;
+    meter('vibFill', 'vibTick', d.swing, ts.vibration, 100);
+    setBadge($('vibTag'), d.vibAlert ? 'Movement detected' : 'Still', d.vibAlert ? 'alert' : 'ok');
+    $('mVib').dataset.alert = String(!!d.vibAlert);
+
+    // z
+    $('z').textContent = d.z; $('zRange').textContent = `${d.minZ}–${d.maxZ}`;
+    const zb = $('zBand'); zb.style.left = d.minZ / 1023 * 100 + '%'; zb.style.width = Math.max(.6, (d.maxZ - d.minZ) / 1023 * 100) + '%';
+    const zd = $('zDot'); zd.style.display = ''; zd.style.left = d.z / 1023 * 100 + '%';
+    setBadge($('zTag'), `Δ ${d.maxZ - d.minZ}`, '');
+
+    // overall state
+    const state = d.tempAlert && d.vibAlert ? 'both' : d.tempAlert ? 'temp' : d.vibAlert ? 'vib' : 'normal';
+    if (!d.tempValid) setStatus('warn', 'Temperature sensor needs attention', 'The DHT11 did not return a valid reading. Check the D2 data line, power, ground and any required 4.7–10 kΩ pull-up resistor.');
+    else if (state === 'normal') setStatus('ok', 'Hive conditions are normal', `All readings are within your limits. Temperature ${fmt(d.temperature, 1)} °C, vibration ${d.swing} counts.`);
+    else if (state === 'both') setStatus('alert', 'Temperature and vibration alerts', `Temperature ${fmt(d.temperature, 1)} °C ≥ ${fmt(ts.temperature, 1)} °C and vibration ${d.swing} ≥ ${ts.vibration} counts. Buzzer on, LED solid.`);
+    else if (state === 'temp') setStatus('alert', 'Temperature above limit', `${fmt(d.temperature, 1)} °C is at or above the ${fmt(ts.temperature, 1)} °C limit. Buzzer on, LED blinking slowly.`);
+    else setStatus('alert', 'Vibration detected', `Movement of ${d.swing} counts reached the ${ts.vibration}-count limit. Buzzer on, LED blinking fast.`);
+    setOutputs(d);
+
+    if (state !== prevState) {
+      const msg = { normal: 'Conditions normal', both: 'Temperature + vibration alert', temp: `Temperature alert · ${fmt(d.temperature, 1)} °C`, vib: `Vibration alert · ${d.swing} counts` }[state];
+      if (prevState !== null || state !== 'normal') addEvent(msg, state === 'normal' ? 'ok' : 'alert');
+      prevState = state;
+    }
+    if (prevValid !== null && prevValid !== d.tempValid) addEvent(d.tempValid ? 'DHT11 readings restored' : 'DHT11 reading invalid', d.tempValid ? 'ok' : 'warn');
+    prevValid = d.tempValid;
+  } else {
+    setStatus('offline', !s ? 'Dashboard server unavailable' : 'Arduino disconnected',
+      !s ? 'Start the local server with python3 server.py, then reload this page.' : (s.error || 'Connect USB and run the dashboard firmware.'));
+    ['temp', 'humidity', 'vib', 'z'].forEach(id => $(id).textContent = '--');
+    ['tempDelta', 'humDelta', 'vibDelta', 'zRange'].forEach(id => $(id).textContent = '');
+    ['tempTag', 'humidityTag', 'vibTag', 'zTag'].forEach(id => setBadge($(id), 'Awaiting device', ''));
+    ['mTemp', 'mVib'].forEach(id => $(id).dataset.alert = 'false');
+    $('tempFill').style.width = '0'; $('vibFill').style.width = '0'; $('tempTick').style.display = 'none'; $('vibTick').style.display = 'none'; $('humDot').style.display = 'none'; $('zDot').style.display = 'none'; $('zBand').style.width = '0';
+    $('tempDev').textContent = '—'; $('vibDev').textContent = '—';
+    setOutputs(null);
+    if (!applying) notice('Connect the Arduino to enable controls.');
+    edited = false; prevState = null; prevValid = null;
+  }
+  updateDirty();
+  redraw();
+}
+
+/* ── API (real or demo) ────────────────────────────── */
+const real = {
+  async status() { const r = await fetch('/api/status', { cache: 'no-store' }); if (!r.ok) throw Error('Server unavailable'); return r.json(); },
+  async post(body) {
+    const r = await fetch('/api/thresholds', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const data = await r.json(); if (!r.ok) throw Error(data.error || 'Failed'); return data;
+  }
+};
+const demo = (() => {
+  const boot = Date.now(), hist = [], settings = { temperature: 30, vibration: 35 };
+  let temp = 28.6, hum = 58, pending = null;
+  function tick() {
+    const t = Date.now() / 1000, el = (Date.now() - boot) / 1000;
+    temp += (Math.sin(el / 18) * .03) + (Math.random() - .5) * .08; temp = clamp(temp, 24, 34);
+    hum += (Math.random() - .5) * .4; hum = clamp(hum, 44, 74);
+    const burst = (el % 40) > 33 ? 30 + Math.random() * 25 : 0;
+    const swing = Math.round(6 + Math.random() * 8 + burst), z = Math.round(512 + (Math.random() - .5) * swing);
+    const valid = !((el % 90) > 86);
+    if (pending && Date.now() > pending.at) { Object.assign(settings, pending.v); pending = null; }
+    const p = { type: 'telemetry', ms: Date.now() - boot + 734000, temperature: valid ? +temp.toFixed(2) : null, humidity: valid ? +hum.toFixed(2) : null, tempValid: valid,
+      z, minZ: z - (swing >> 1), maxZ: z - (swing >> 1) + swing, swing, tempThreshold: settings.temperature, vibThreshold: settings.vibration,
+      tempAlert: valid && temp >= settings.temperature, vibAlert: swing >= settings.vibration };
+    hist.push({ t, ...p }); if (hist.length > 200) hist.shift();
+  }
+  for (let i = 0; i < 80; i++) tick();
+  hist.forEach((p, i) => p.t = Date.now() / 1000 - (hist.length - i) * .5);
+  setInterval(tick, 500);
+  return {
+    async status() { const l = hist[hist.length - 1]; return { connected: true, port: '/dev/cu.usbserial-DEMO', error: null, lastSeen: l.t, latest: l, settings: { ...settings }, history: hist.slice(-100) }; },
+    async post(v) { pending = { at: Date.now() + 700, v: { temperature: v.temperature, vibration: v.vibration } }; return { ok: true }; }
+  };
+})();
+const api = DEMO ? demo : real;
+
+async function update() {
+  try { snap = await api.status(); connected = !!snap.connected && !!snap.latest && Date.now() / 1000 - snap.lastSeen < 4; }
+  catch (e) { snap = null; connected = false; }
+  render();
+}
+
+syncFromRange(); setStatus('offline', 'Awaiting sensor data', 'Connecting to the local dashboard server…');
+update(); setInterval(update, POLL_MS);
+})();
+</script>
+</body>
+</html>
