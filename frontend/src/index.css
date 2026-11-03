@@ -1,0 +1,190 @@
+@import 'tailwindcss';
+@import 'goey-toast/styles.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ───────────── Tokens ───────────── */
+:root {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --surface-2: #fbfaf7;
+  --sunken: #f0ede6;
+  --border: #e7e2d8;
+  --border-strong: #d6cfc2;
+  --fg: #16130c;
+  --fg-2: #5b554a;
+  --fg-3: #8e877a;
+  --honey: #e8a317;
+  --honey-strong: #c98a0c;
+  --honey-ink: #8a5a00;
+  --honey-soft: #fcf1d8;
+  --ok: #15803d;
+  --ok-soft: #e7f4eb;
+  --warn: #b45309;
+  --warn-soft: #fdf0e0;
+  --danger: #c8322b;
+  --danger-soft: #fcebea;
+  --info: #2f6fdb;
+  --info-soft: #e9f0fc;
+  --temp: #d9850b;
+  --hum: #2f6fdb;
+  --vib: #0e8a7e;
+  --zaxis: #7a5ad9;
+  --grid: #ece8e0;
+  --ring: color-mix(in srgb, var(--honey) 40%, transparent);
+}
+.dark {
+  --bg: #0d0c0a;
+  --surface: #151411;
+  --surface-2: #1a1915;
+  --sunken: #11100d;
+  --border: #26241f;
+  --border-strong: #35322b;
+  --fg: #f1eee8;
+  --fg-2: #a8a195;
+  --fg-3: #6f695e;
+  --honey: #f0b232;
+  --honey-strong: #f5c55e;
+  --honey-ink: #f5c55e;
+  --honey-soft: #2a2214;
+  --ok: #4ade80;
+  --ok-soft: #12241a;
+  --warn: #f59e0b;
+  --warn-soft: #2a1e0e;
+  --danger: #f87171;
+  --danger-soft: #2c1615;
+  --info: #6b9bf2;
+  --info-soft: #141d2e;
+  --temp: #f0a43a;
+  --hum: #6b9bf2;
+  --vib: #2dc2b0;
+  --zaxis: #a58bf0;
+  --grid: #201f1b;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-sunken: var(--sunken);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-honey: var(--honey);
+  --color-honey-strong: var(--honey-strong);
+  --color-honey-ink: var(--honey-ink);
+  --color-honey-soft: var(--honey-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-temp: var(--temp);
+  --color-hum: var(--hum);
+  --color-vib: var(--vib);
+  --color-zaxis: var(--zaxis);
+  --color-grid: var(--grid);
+  --color-ink: #16130c;
+  --color-bone: #f7f5f0;
+
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
+
+  --shadow-xs: 0 1px 0 rgb(22 19 12 / 0.03), 0 1px 2px rgb(22 19 12 / 0.05);
+  --shadow-card: 0 1px 2px rgb(22 19 12 / 0.04), 0 10px 30px -12px rgb(22 19 12 / 0.12);
+  --shadow-pop: 0 2px 4px rgb(22 19 12 / 0.05), 0 24px 48px -16px rgb(22 19 12 / 0.28);
+
+  --animate-marquee: marquee 40s linear infinite;
+}
+
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* ───────────── Base ───────────── */
+@layer base {
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: var(--honey-soft); color: var(--fg); }
+  :focus-visible { outline: 2px solid var(--honey); outline-offset: 2px; border-radius: 6px; }
+  button { cursor: pointer; }
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
+}
+
+@utility tnum { font-variant-numeric: tabular-nums; }
+@utility text-balance { text-wrap: balance; }
+
+/* Honeycomb pattern used for fallbacks and section texture */
+@utility bg-honeycomb {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='98' viewBox='0 0 56 98'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0 32L0 82V50l28 16 28-16v32L28 98z' fill='none' stroke='%23E8A317' stroke-opacity='.22' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 28px 49px;
+}
+
+/* ───────────── Icon micro-interactions ─────────────
+   Put `group` on the trigger; add one of these to the icon.            */
+@keyframes ico-ring { 0%,100% { transform: rotate(0) } 15% { transform: rotate(14deg) } 30% { transform: rotate(-12deg) } 45% { transform: rotate(9deg) } 60% { transform: rotate(-6deg) } 75% { transform: rotate(3deg) } }
+@keyframes ico-wiggle { 0%,100% { transform: rotate(0) } 25% { transform: rotate(-9deg) } 75% { transform: rotate(9deg) } }
+@keyframes ico-pop { 0% { transform: scale(1) } 40% { transform: scale(1.22) } 70% { transform: scale(.94) } 100% { transform: scale(1) } }
+@keyframes ico-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
+@keyframes ico-pulse { 0%,100% { transform: scaleY(1) } 50% { transform: scaleY(.82) } }
+@keyframes ico-shake { 0%,100% { transform: translateX(0) } 20%,60% { transform: translateX(-2px) } 40%,80% { transform: translateX(2px) } }
+@keyframes ico-tilt { 0%,100% { transform: rotate(0) } 50% { transform: rotate(-14deg) scale(1.05) } }
+
+.ico { transition: transform .35s cubic-bezier(.2,.8,.2,1), color .2s; transform-origin: center; }
+.ico-ring { transform-origin: 50% 10%; }
+.group:hover .ico-ring, .ico-ring.is-active { animation: ico-ring .8s ease-in-out; }
+.group:hover .ico-spin { transform: rotate(90deg); }
+.group:hover .ico-wiggle { animation: ico-wiggle .45s ease-in-out; }
+.group:hover .ico-pop { animation: ico-pop .5s cubic-bezier(.2,.8,.2,1); }
+.group:hover .ico-float { animation: ico-float .8s ease-in-out infinite; }
+.group:hover .ico-pulse { animation: ico-pulse .6s ease-in-out infinite; transform-origin: bottom; }
+.group:hover .ico-shake { animation: ico-shake .4s ease-in-out; }
+.group:hover .ico-tilt { animation: ico-tilt .5s ease-in-out; }
+.group:hover .ico-nudge { transform: translateX(3px); }
+.group:hover .ico-nudge-up { transform: translate(2px, -2px); }
+.group:hover .ico-flip { transform: rotate(-180deg); }
+.group:hover .ico-grow { transform: scale(1.15); }
+
+/* Status lamps */
+@keyframes lamp-blink { 0%,49% { opacity: 1 } 50%,100% { opacity: .15 } }
+.lamp-slow { animation: lamp-blink 2s steps(1,end) infinite; }
+.lamp-fast { animation: lamp-blink .3s steps(1,end) infinite; }
+@keyframes ping-soft { 0% { transform: scale(.7); opacity: .7 } 80%,100% { transform: scale(2.1); opacity: 0 } }
+.ping-soft { animation: ping-soft 2s cubic-bezier(0,0,.2,1) infinite; }
+@keyframes eq { from { height: 3px } to { height: 12px } }
+
+/* Range input */
+.range {
+  --p: 50%;
+  -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; margin: 0; cursor: pointer;
+}
+.range::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: linear-gradient(90deg, var(--fg) var(--p), var(--sunken) var(--p)); }
+.range::-moz-range-track { height: 4px; border-radius: 999px; background: linear-gradient(90deg, var(--fg) var(--p), var(--sunken) var(--p)); }
+.range::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border-strong); box-shadow: 0 1px 3px rgb(0 0 0 / .2); transition: transform .15s; }
+.range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border-strong); box-shadow: 0 1px 3px rgb(0 0 0 / .2); }
+.range:hover::-webkit-slider-thumb { transform: scale(1.12); }
+.range:focus-visible { outline: none; }
+.range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px var(--ring); }
+
+/* Thin scrollbars inside app panels */
+.scroll-thin { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}

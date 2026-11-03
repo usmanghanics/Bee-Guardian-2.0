@@ -2,6 +2,7 @@
 """Local-only Bee Guardian Uno USB serial dashboard server."""
 import argparse
 import json
+import mimetypes
 import threading
 import time
 from collections import deque
@@ -129,16 +130,30 @@ class Handler(BaseHTTPRequestHandler):
                     snapshot["error"] = "No recent telemetry; check firmware and USB connection"
             self.respond(200, snapshot)
             return
-        files = {"/": "index.html", "/index.html": "index.html"}
-        filename = files.get(path)
-        if filename is None:
+        self.serve_static(path)
+
+    def serve_static(self, path):
+        """Serve the built frontend from web/, falling back to index.html for app routes."""
+        web = (ROOT / "web").resolve()
+        target = (web / path.lstrip("/")).resolve()
+        if web not in target.parents and target != web:
             self.send_error(404)
             return
-        body = (ROOT / "web" / filename).read_bytes()
+        if not target.is_file():
+            if path.startswith("/assets/") or Path(path).suffix:
+                self.send_error(404)
+                return
+            target = web / "index.html"  # client-side route
+        body = target.read_bytes()
+        ctype = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
+        if ctype.startswith("text/") or ctype in ("application/javascript", "image/svg+xml"):
+            ctype += "; charset=utf-8"
         self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
+        # Hashed build assets can be cached forever; HTML must always be fresh.
+        cache = "public, max-age=31536000, immutable" if path.startswith("/assets/") else "no-store"
+        self.send_header("Cache-Control", cache)
         self.end_headers()
         self.wfile.write(body)
 
@@ -165,6 +180,10 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(400, {"error": str(exc)})
         except (OSError, serial.SerialException) as exc:
             self.respond(503, {"error": f"Serial write failed: {exc}"})
+
+mimetypes.add_type("application/javascript", ".js")
+mimetypes.add_type("font/woff2", ".woff2")
+mimetypes.add_type("font/woff", ".woff")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
