@@ -1,20 +1,30 @@
-// Bee Guardian 2.0: Uno + LM35 (A0) + GY-61 ZOUT (A1) + buzzer (D8) + LED (D9)
+// Bee Guardian 2.0: Uno + DHT11 (D2) + GY-61 ZOUT (A1) + buzzer (D8) + LED (D9)
 // USB Serial: newline-delimited JSON telemetry; SET TEMP <degrees> / SET VIB <counts>
 // Commands are case-sensitive, e.g. SET TEMP 30.5 and SET VIB 35.
 
-#define LM35_PIN A0
+#include <DHT.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define DHTPIN 2
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
 #define GY61_PIN A1
 #define BUZZER_PIN 8
 #define LED_PIN 9
 
 const unsigned long SAMPLE_MS = 10;
 const unsigned long REPORT_MS = 500;
+const unsigned long DHT_READ_MS = 2200; // DHT11 measurement interval
 const unsigned long TEMP_BLINK_MS = 1000;
 const unsigned long VIB_BLINK_MS = 150;
 
 float tempThreshold = 30.0f;
 int vibThreshold = 35;
-unsigned long lastSample = 0, lastReport = 0, lastBlink = 0;
+unsigned long lastSample = 0, lastReport = 0, lastBlink = 0, lastDhtRead = 0;
+float lastTemperature = NAN, lastHumidity = NAN;
+bool tempValid = false;
 int minZ = 1023, maxZ = 0, lastZ = 0;
 bool tempAlert = false, vibAlert = false, ledState = false;
 uint8_t mode = 0;
@@ -71,13 +81,21 @@ void readCommands() {
   }
 }
 
-float readLM35() {
-  // UNO 10-bit ADC with default AVcc reference (assumed 5.0 V).
-  // Throw away first reading after switching ADC channels.
-  analogRead(LM35_PIN);
-  long sum = 0;
-  for (uint8_t i = 0; i < 12; ++i) sum += analogRead(LM35_PIN);
-  return (sum / 12.0f) * (500.0f / 1023.0f);
+void readDHT11() {
+  float t = dht.readTemperature();
+  float h = dht.readHumidity();
+  // DHT11 temperature and humidity are trusted only within sensor specifications.
+  tempValid = !isnan(t) && !isnan(h) &&
+              t >= 0.0f && t <= 50.0f &&
+              h >= 20.0f && h <= 90.0f;
+  if (tempValid) {
+    lastTemperature = t;
+    lastHumidity = h;
+  } else {
+    lastTemperature = NAN;
+    lastHumidity = NAN;
+    tempAlert = false;
+  }
 }
 
 void updateIndicators(unsigned long now) {
@@ -106,7 +124,9 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
   Serial.begin(9600);
+  dht.begin();
   lastReport = millis();
+  lastDhtRead = millis();
   sendSettings();
 }
 
@@ -120,18 +140,24 @@ void loop() {
     if (lastZ < minZ) minZ = lastZ;
     if (lastZ > maxZ) maxZ = lastZ;
   }
+  if (now - lastDhtRead >= DHT_READ_MS) {
+    lastDhtRead = now;
+    readDHT11();
+  }
   if (now - lastReport >= REPORT_MS) {
     lastReport = now;
-    float tempC = readLM35();
     int swing = maxZ - minZ;
-    bool tempValid = (tempC >= -5.0f && tempC <= 150.0f);
-    tempAlert = tempValid && (tempC >= tempThreshold);
+    tempAlert = tempValid && (lastTemperature >= tempThreshold);
     vibAlert = (swing > vibThreshold);
 
     Serial.print(F("{\"type\":\"telemetry\",\"ms\":"));
     Serial.print(now);
     Serial.print(F(",\"temperature\":"));
-    Serial.print(tempC, 2);
+    if (tempValid) Serial.print(lastTemperature, 2);
+    else Serial.print(F("null"));
+    Serial.print(F(",\"humidity\":"));
+    if (tempValid) Serial.print(lastHumidity, 2);
+    else Serial.print(F("null"));
     Serial.print(F(",\"tempValid\":"));
     Serial.print(tempValid ? F("true") : F("false"));
     Serial.print(F(",\"z\":"));

@@ -1,13 +1,13 @@
 # Bee Guardian 2.0 — local live dashboard
 
-A light-theme, functional local browser dashboard for **Arduino Uno + LM35 + GY-61 + buzzer + LED**. No potentiometer, infrared sensor, cloud account, or paid service required.
+A light-theme, functional local browser dashboard for **Arduino Uno + DHT11 + GY-61 + buzzer + LED**. No potentiometer, infrared sensor, cloud account, or paid service required.
 
-## Wiring (unchanged)
+## Wiring (updated for DHT11)
 
 | Part | Arduino Uno |
 | --- | --- |
-| LM35 signal | A0 |
-| LM35 power | 5V and GND (verify model's pinout) |
+| DHT11 DATA / OUT | D2 |
+| DHT11 VCC / GND | 5V / GND (check module labels) |
 | GY-61 ZOUT | A1 |
 | GY-61 VCC | **3.3V**, not 5V |
 | GY-61 GND | GND |
@@ -20,7 +20,7 @@ A light-theme, functional local browser dashboard for **Arduino Uno + LM35 + GY-
 
 1. Open `arduino/BeeGuardianDashboard.ino` in Arduino IDE.
 2. Set **Board: Arduino Uno** and select the USB port under Tools → Port.
-3. Upload. The sketch compiles with only built-in Arduino libraries.
+3. Install **DHT sensor library by Adafruit** and **Adafruit Unified Sensor** in Arduino IDE Library Manager; then upload.
 4. **Close Serial Monitor and Serial Plotter** before starting the server: only one program can use the serial port at a time.
 
 ## 2. Start dashboard on macOS
@@ -59,9 +59,14 @@ Use the real port shown on your Mac; its suffix may change. If port vanishes, ch
 
 The Arduino outputs one JSON telemetry object per line at 9600 baud. Python `pyserial` reads it and exposes `GET /api/status` on localhost, while `POST /api/thresholds` sends `SET TEMP 32.0` and `SET VIB 45` commands back to Arduino. The dashboard polls the local server approximately every 700 ms. No external libraries or CDNs are needed in the web UI.
 
-## Important LM35 issue
+## DHT11 temperature and humidity monitoring
 
-Your earlier serial logs contained rapidly changing and impossible readings (e.g. 500 °C). The dashboard marks temperatures outside -5 to 150 °C invalid, but **values within this range can also be inaccurate** if wiring, USB power, ADC reference, or sensor are faulty. Verify against a thermometer before relying on alerts. Firmware assumes Arduino Uno AVcc=5.0 V. Do not use this as a safety-critical hive protection device without calibration and validation.
+Remove the old analog LM35 sensor. DHT11 DATA/OUT is connected to **D2**. GY-61 remains powered from **3.3V** with ZOUT at **A1**. DHT11 provides temperature in Celsius and relative humidity; the firmware reads it approximately every 2.2 seconds and transmits JSON telemetry every 500 ms.
+
+If a DHT11 reading fails, the firmware emits `temperature: null`, `humidity: null`, and `tempValid: false`; the dashboard shows an invalid-sensor warning instead of an invented temperature. Some bare DHT11 units need a DATA pull-up resistor (typically 4.7–10 kΩ). Check your module and wiring.
+
+Your earlier DHT11 test failed repeatedly. This software does not fix defective wiring or hardware. Confirm accurate readings before relying on alarms.
+
 
 ## Troubleshooting
 
@@ -70,3 +75,7 @@ Your earlier serial logs contained rapidly changing and impossible readings (e.g
 - **No threshold confirmation:** Check USB link and do not refresh while waiting for commands.
 - **Unusual GY-61 values:** Verify 3.3V power, common ground, correct ZOUT/A1 wiring, and test motion against rest.
 - **Stop:** Press Ctrl+C in Terminal. Server only listens on `127.0.0.1` and is not exposed on the network.
+
+## Dashboard migration (November 2026)
+
+The light dashboard includes a DHT11 humidity card and keeps temperature/vibration threshold controls, LED blink modes, and buzzer alarms. No change is required to `server.py` or `requirements.txt`. Threshold values reset after an Arduino reboot.
