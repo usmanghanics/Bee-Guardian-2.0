@@ -46,17 +46,38 @@ python3 server.py --port /dev/cu.usbserial-1410
 
 Use the real port shown on your Mac; its suffix may change. If port vanishes, check USB cable/adapter. If port is busy, close Arduino Serial Monitor, IDE serial plotter and other serial apps.
 
-## Dashboard UI
+## Frontend
 
-The dashboard is a single self-contained file (`web/index.html`, no CDNs or fonts downloaded) with:
+The web app is a React + TypeScript + Tailwind project in `frontend/`. Its production build is committed to `web/`, so **`python3 server.py` serves the full app with no Node.js needed**.
 
-- A system-status band that mirrors the hardware: buzzer state, LED mode (off / slow blink / fast blink / solid) and Arduino uptime.
-- Metric cards for temperature, humidity, vibration and raw Z-axis, each with a sparkline, short-term trend and a meter showing the value against its limit.
-- One telemetry chart with Temperature / Humidity / Vibration tabs, a hover tooltip, the alert limit and shaded alert zone, and min / avg / max stats.
-- Threshold controls with sliders and steppers, an "unsaved changes" indicator, Revert, and Apply with device confirmation.
-- A session activity timeline, light/dark theme (follows the OS, toggle in the top bar), and a mobile layout.
+| Route | What it is |
+| --- | --- |
+| `/` | Product landing page: 3D honeycomb hero, features, live dashboard preview, setup steps, hardware specs, FAQ, footer |
+| `/login`, `/signup`, `/forgot-password` | Authentication screens (front-end demo, see below) |
+| `/app` | Overview: system status, live metric cards, telemetry chart, threshold editor, activity |
+| `/app/analytics` | Per-sensor charts with 1 min / 5 min / 15 min / session ranges, stats, CSV export |
+| `/app/alerts` | Alert and event log with filters, acknowledge, clear |
+| `/app/device` | Connection details, live LED/buzzer state, wiring reference, raw JSON, troubleshooting |
+| `/app/settings` | Thresholds, notification toasts/sound, theme, data source, profile |
 
-**Preview without hardware:** open **http://127.0.0.1:8765/?demo** to run the UI on simulated data. It's labelled "Demo data" in the top bar and never talks to the Arduino.
+Also included: collapsible sidebar and mobile drawer, top bar with ⌘K / Ctrl+K command menu, notifications and account menu, gooey toasts ([goey-toast](https://www.npmjs.com/package/goey-toast)), Lucide icons with hover micro-animations, light/dark/system themes, and reduced-motion support.
+
+**Demo sign-in:** `demo@beeguardian.app` / `honeybee`, or create an account. Accounts are stored only in your browser's local storage — there is no backend, so don't reuse a real password.
+
+**No hardware?** Choose **Simulated** in the sidebar (or open any page with `?demo`). The simulator follows the firmware's alarm rules exactly. Switch back to **Live** to read the Arduino.
+
+**Photos:** put your own bee photos in `frontend/public/images/` (file names and suggested subjects are listed in `frontend/public/images/README.md`) and rebuild. Until then, a designed honeycomb placeholder is shown.
+
+### Working on the frontend
+
+```bash
+cd frontend
+npm install
+npm run dev      # http://localhost:5173, proxies /api to server.py on :8765
+npm run build    # type-checks and writes the production build to ../web
+```
+
+Run `python3 server.py` alongside `npm run dev` to develop against the real Arduino.
 
 ## Dashboard controls
 
@@ -69,7 +90,7 @@ The dashboard is a single self-contained file (`web/index.html`, no CDNs or font
 
 ## How it works
 
-The Arduino outputs one JSON telemetry object per line at 9600 baud. Python `pyserial` reads it and exposes `GET /api/status` on localhost, while `POST /api/thresholds` sends `SET TEMP 32.0` and `SET VIB 45` commands back to Arduino. The dashboard polls the local server approximately every 700 ms. No external libraries or CDNs are needed in the web UI.
+The Arduino outputs one JSON telemetry object per line at 9600 baud. Python `pyserial` reads it and exposes `GET /api/status` on localhost, while `POST /api/thresholds` sends `SET TEMP 32.0` and `SET VIB 45` commands back to Arduino. The dashboard polls the local server approximately every 700 ms. The built web UI is fully self-contained (fonts and libraries are bundled), so it works offline.
 
 ## DHT11 temperature and humidity monitoring
 
