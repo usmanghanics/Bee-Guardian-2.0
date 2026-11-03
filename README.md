@@ -46,6 +46,18 @@ python3 server.py --port /dev/cu.usbserial-1410
 
 Use the real port shown on your Mac; its suffix may change. If port vanishes, check USB cable/adapter. If port is busy, close Arduino Serial Monitor, IDE serial plotter and other serial apps.
 
+## Dashboard UI
+
+The dashboard is a single self-contained file (`web/index.html`, no CDNs or fonts downloaded) with:
+
+- A system-status band that mirrors the hardware: buzzer state, LED mode (off / slow blink / fast blink / solid) and Arduino uptime.
+- Metric cards for temperature, humidity, vibration and raw Z-axis, each with a sparkline, short-term trend and a meter showing the value against its limit.
+- One telemetry chart with Temperature / Humidity / Vibration tabs, a hover tooltip, the alert limit and shaded alert zone, and min / avg / max stats.
+- Threshold controls with sliders and steppers, an "unsaved changes" indicator, Revert, and Apply with device confirmation.
+- A session activity timeline, light/dark theme (follows the OS, toggle in the top bar), and a mobile layout.
+
+**Preview without hardware:** open **http://127.0.0.1:8765/?demo** to run the UI on simulated data. It's labelled "Demo data" in the top bar and never talks to the Arduino.
+
 ## Dashboard controls
 
 - Temperature threshold: 15–80 °C, default 30 °C.
