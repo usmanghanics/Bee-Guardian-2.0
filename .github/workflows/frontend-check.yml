@@ -10,6 +10,9 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-check.yml'
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: write
 jobs:
@@ -37,5 +40,7 @@ jobs:
           git add -A web
           if ! git diff --cached --quiet; then
             git commit -m "Build updated Bee Guardian web application"
+            git fetch origin design/apple-inspired-experience
+            git rebase origin/design/apple-inspired-experience
             git push origin HEAD:design/apple-inspired-experience
           fi
