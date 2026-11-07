@@ -7,16 +7,9 @@ import { AreaChart } from '@/components/charts/charts'
 import { Button } from '@/components/ui/button'
 import { Card, Eyebrow, Segmented } from '@/components/ui/primitives'
 import { HUMIDITY_REFERENCE, useTelemetry } from '@/lib/telemetry'
-import { useAuth } from '@/lib/auth'
 import { fmt } from '@/lib/utils'
 
-function greeting() {
-  const h = new Date().getHours()
-  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'
-}
-
 export default function Overview() {
-  const { user } = useAuth()
   const { history, settings, link, exportCsv } = useTelemetry()
   const [series, setSeries] = useState<Exclude<SeriesKey, 'z'>>('temperature')
   const recent = history.slice(-120)
@@ -28,8 +21,8 @@ export default function Overview() {
   return (
     <>
       <PageHeader
-        title={`${greeting()}, ${user?.name.split(' ')[0] ?? 'beekeeper'}`}
-        description="Here’s what’s happening inside Hive 01 right now."
+        title="Hive overview"
+        description="Real-time conditions, recent trends, and threshold controls for Hive 01."
         actions={<Button variant="secondary" size="sm" onClick={() => (history.length ? (exportCsv(), gooeyToast.success('Export ready', { description: `${history.length} readings saved as CSV.` })) : gooeyToast.warning('Nothing to export yet'))}><Download className="ico ico-float size-3.5" /> Export</Button>}
       />
       <OfflineNotice />
