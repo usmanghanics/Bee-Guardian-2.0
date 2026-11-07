@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import {
-  Activity, ArrowRight, ArrowUpRight, BellRing, ChartLine, Check, ChevronRight, Cpu,
-  Droplets, Gauge, Menu, Radio, Settings2, ShieldCheck, Thermometer, Usb, Waves, X,
+  Activity, ArrowRight, ArrowUpRight, BellRing, ChartLine, ChevronRight, Cpu,
+  Droplets, Gauge, Menu, Settings2, Thermometer, X,
 } from 'lucide-react'
 import { LogoMark } from '@/components/ui/brand'
 import { useAuth } from '@/lib/auth'
@@ -233,7 +233,7 @@ export default function Landing() {
           <span>© {new Date().getFullYear()} Bee Guardian. Independently designed and developed.</span>
           <div className="ag-footer-links"><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><a href="#hardware">Hardware</a><Link to="/login">Dashboard</Link></div>
         </div>
-        <div className="ag-container" style={{ marginTop:18,fontSize:11,color:'#94949b' }}>Photography: Dmytro Glazunov and Jade / Pexels. Example telemetry is simulated; hardware metrics require a connected Arduino.</div>
+        <div className="ag-container" style={{ marginTop:18,fontSize:11,color:'#94949b' }}>Photography: Vitaly Gariev and Anastasiia Melnyk / Pexels. Example telemetry is simulated; hardware metrics require a connected Arduino.</div>
       </footer>
     </div>
   )
