@@ -225,3 +225,25 @@ html.ag-experience .group:hover .ico-spin{transform:rotate(15deg)}
 html.ag-experience .rounded-2xl.border.border-line.bg-surface{box-shadow:var(--shadow-xs)}
 html.ag-experience .range::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--honey-strong) var(--p),var(--sunken) var(--p))}
 html.ag-experience .range::-webkit-slider-thumb{border:2px solid var(--honey)}
+
+/* Legal and recoverable routing errors */
+.ag-site .ag-simple-nav{height:76px;border-bottom:1px solid #ededee;display:flex;align-items:center;background:#fff}
+.ag-site .ag-simple-nav-inner{display:flex;justify-content:space-between;align-items:center;gap:14px;width:100%}
+.ag-site .ag-back-link{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#66666e}
+.ag-site .ag-back-link:hover{color:#202024}
+.ag-site .ag-legal-main{max-width:940px;padding-top:95px;padding-bottom:125px}
+.ag-site .ag-legal-main h1{font-size:clamp(52px,7vw,88px);font-weight:670;letter-spacing:-.075em;line-height:1;margin:16px 0}
+.ag-site .ag-legal-date{font-size:13px;color:#909097}
+.ag-site .ag-legal-sections{display:grid;gap:35px;margin:65px 0}
+.ag-site .ag-legal-sections section{border-top:1px solid #e8e8ec;padding-top:26px}
+.ag-site .ag-legal-sections h2{font-size:22px;letter-spacing:-.038em;font-weight:620;margin:0 0 12px}
+.ag-site .ag-legal-sections p{color:#6b6b72;line-height:1.72;font-size:16px;max-width:70ch}
+.ag-site .ag-legal-return{font-size:15px;display:inline-flex;align-items:center;gap:8px;color:#9b7017;font-weight:600}
+.ag-site.ag-notfound{min-height:100svh;display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% 30%,#fff8e8,#fff 65%)}
+.ag-site .ag-notfound-main{display:flex;align-items:center;justify-content:center;flex:1;flex-direction:column;text-align:center;padding:60px 20px 95px}
+.ag-site .ag-notfound-graphic{width:170px;height:170px;display:grid;place-items:center;position:relative;margin-bottom:39px}
+.ag-site .ag-notfound-ring{width:110px;height:110px;display:grid;place-items:center;border-radius:29px;background:linear-gradient(140deg,#ffe5a0,#d8a738);box-shadow:0 14px 30px #cc983d3a,0 0 0 17px #dcb34216,0 0 0 38px #dcb3420b}
+.ag-site .ag-notfound-main h1{font-size:clamp(44px,6.2vw,80px);line-height:1.03;letter-spacing:-.075em;font-weight:675;margin:20px 0}
+.ag-site .ag-notfound-main p{font-size:16px;color:#77777d;max-width:450px;line-height:1.6}
+.ag-site .ag-notfound-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:24px}
+@media(max-width:700px){.ag-site .ag-simple-nav{height:66px}.ag-site .ag-back-link{font-size:11px}.ag-site .ag-legal-main{padding-top:65px;padding-bottom:85px}.ag-site .ag-legal-sections{margin-top:45px}.ag-site .ag-notfound-graphic{transform:scale(.8);margin-bottom:17px}}
