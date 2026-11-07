@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Home, KeyRound, Lock, Mail, MailCheck, Sparkles, User } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Home, KeyRound, Lock, Mail, MailCheck, Sparkles, Thermometer, User } from 'lucide-react'
 import { gooeyToast } from 'goey-toast'
-import { Logo, Photo } from '@/components/ui/brand'
+import { Logo } from '@/components/ui/brand'
+import '@/apple-experience.css'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/primitives'
 import { GithubIcon, GoogleIcon } from '@/components/ui/icons'
@@ -13,37 +14,37 @@ import { cn } from '@/lib/utils'
 const EMAIL_RE = /^\S+@\S+\.\S+$/
 
 function Shell({ children, title }: { children: ReactNode; title: string }) {
-  useEffect(() => {
-    document.title = `${title} · Bee Guardian`
-  }, [title])
+  useEffect(() => { document.title = title + ' · Bee Guardian' }, [title])
   return (
-    <div className="grid min-h-[100svh] bg-bg lg:grid-cols-[1fr_1.05fr]">
-      <div className="relative flex flex-col px-5 py-6 sm:px-10">
-        <div className="flex items-center justify-between">
-          <Logo />
-          <Link to="/" className="group inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] text-fg-2 hover:bg-sunken hover:text-fg">
-            <ArrowLeft className="ico ico-nudge size-3.5 group-hover:-translate-x-0.5" /> Back to site
-          </Link>
-        </div>
-        <div className="mx-auto flex w-full max-w-[400px] flex-1 flex-col justify-center py-12">
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}>{children}</motion.div>
-        </div>
-        <p className="text-center text-[12px] text-fg-3">Demo authentication — accounts are stored only in this browser.</p>
+    <div className="ag-auth-root">
+      <div className="ag-auth-navigation">
+        <Logo />
+        <Link to="/" className="ag-auth-back"><ArrowLeft size={15} /> Back to website</Link>
       </div>
-      <aside className="relative hidden overflow-hidden p-3 lg:block">
-        <div className="relative h-full overflow-hidden rounded-[28px]">
-          <Photo src="/images/auth.jpg" alt="Honey bees at the hive entrance" caption="images/auth.jpg" className="absolute inset-0" priority />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/10" />
-          <motion.figure initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }} className="absolute inset-x-10 bottom-10 text-bone">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/30 px-3 py-1.5 text-[12.5px] backdrop-blur-md">
-              <span className="relative flex size-2"><span className="ping-soft absolute inset-0 rounded-full bg-[#4ade80]" /><span className="relative size-2 rounded-full bg-[#4ade80]" /></span>
-              Hive 01 · 28.4 °C · 58 % RH
+      <main className="ag-auth-main">
+        <section className="ag-auth-content" aria-label={title}>
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .45, ease: [.2,.8,.2,1] }}>
+            {children}
+          </motion.div>
+          <p className="ag-auth-notice">Demo access only. Accounts are stored in this browser, not on a remote service.</p>
+        </section>
+        <aside className="ag-auth-showcase" aria-label="Discover Bee Guardian">
+          <div className="ag-auth-photo" role="img" aria-label="Beekeeper caring for a hive"/>
+          <div className="ag-auth-shade" />
+          <div className="ag-auth-showcase-top"><span className="ag-auth-dot" /> A closer connection to your hive</div>
+          <div className="ag-auth-showcase-content">
+            <div className="ag-auth-eyebrow">BEE GUARDIAN 2.0</div>
+            <h2>Every hive has<br/>a <em>story to tell.</em></h2>
+            <p>From the smallest change in temperature to an unexpected disturbance, find clarity in every signal.</p>
+            <div className="ag-auth-mini-card">
+              <div className="ag-auth-mini-icon"><Thermometer size={19}/></div>
+              <div><strong>Real-time awareness</strong><span>Temperature · Humidity · Vibration</span></div>
+              <Check size={18} style={{ marginLeft: 'auto', color: '#8dc99f' }}/>
             </div>
-            <blockquote className="max-w-[22ch] text-balance font-serif text-[44px] leading-[1.05] tracking-[-0.01em]">The hive, heard in real time.</blockquote>
-            <figcaption className="mt-4 max-w-[40ch] text-[14.5px] leading-relaxed text-bone/70">Temperature, humidity and disturbance from inside the colony — with alarms that work even when you’re not watching.</figcaption>
-          </motion.figure>
-        </div>
-      </aside>
+          </div>
+        </aside>
+      </main>
+      <div className="ag-auth-bottom"><span>© {new Date().getFullYear()} Bee Guardian</span><div><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link></div></div>
     </div>
   )
 }
@@ -127,8 +128,8 @@ export function Login() {
 
   return (
     <Shell title="Sign in">
-      <h1 className="text-[30px] font-semibold tracking-[-0.035em]">Welcome back</h1>
-      <p className="mt-2 text-[14.5px] text-fg-2">Sign in to check on your hives.</p>
+      <h1 className="ag-auth-heading">Welcome back</h1>
+      <p className="ag-auth-subtitle">Sign in to check on your hives.</p>
       <button onClick={useDemo} className="group mt-6 flex w-full items-center gap-3 rounded-xl border border-dashed border-honey/60 bg-honey-soft/60 px-4 py-3 text-left transition-colors hover:bg-honey-soft">
         <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-honey text-ink"><Sparkles className="ico ico-pop size-4" /></span>
         <span className="min-w-0 flex-1">
@@ -196,8 +197,8 @@ export function Signup() {
   }
   return (
     <Shell title="Create account">
-      <h1 className="text-[30px] font-semibold tracking-[-0.035em]">Create your account</h1>
-      <p className="mt-2 text-[14.5px] text-fg-2">Set up monitoring for your first hive.</p>
+      <h1 className="ag-auth-heading">Create your account</h1>
+      <p className="ag-auth-subtitle">Set up monitoring for your first hive.</p>
       <div className="mt-6"><Social /></div>
       <form onSubmit={submit} noValidate className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -253,15 +254,15 @@ export function ForgotPassword() {
         {sent ? (
           <motion.div key="sent" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}>
             <span className="grid size-12 place-items-center rounded-2xl bg-ok-soft text-ok"><MailCheck className="size-6" /></span>
-            <h1 className="mt-6 text-[30px] font-semibold tracking-[-0.035em]">Check your inbox</h1>
-            <p className="mt-2 text-[14.5px] leading-relaxed text-fg-2">We sent a reset link to <span className="font-medium text-fg">{email}</span>. In this demo no email is actually sent — the demo password is <span className="font-mono">{DEMO_ACCOUNT.password}</span>.</p>
+            <h1 className="mt-6 ag-auth-heading">Check your inbox</h1>
+            <p className="ag-auth-subtitle">We sent a reset link to <span className="font-medium text-fg">{email}</span>. In this demo no email is actually sent — the demo password is <span className="font-mono">{DEMO_ACCOUNT.password}</span>.</p>
             <Link to="/login" className="group mt-8 inline-flex items-center gap-2 text-[14px] font-medium"><ArrowLeft className="size-4" /> Back to sign in</Link>
           </motion.div>
         ) : (
           <motion.div key="form" exit={{ opacity: 0 }}>
             <span className="grid size-12 place-items-center rounded-2xl bg-honey-soft text-honey-ink"><KeyRound className="size-6" /></span>
-            <h1 className="mt-6 text-[30px] font-semibold tracking-[-0.035em]">Forgot your password?</h1>
-            <p className="mt-2 text-[14.5px] text-fg-2">Enter your email and we’ll send you a reset link.</p>
+            <h1 className="mt-6 ag-auth-heading">Forgot your password?</h1>
+            <p className="ag-auth-subtitle">Enter your email and we’ll send you a reset link.</p>
             <form onSubmit={submit} noValidate className="mt-8 space-y-4">
               <Input label="Email" name="email" type="email" autoComplete="email" placeholder="you@apiary.com" value={email} onChange={(e) => setEmail(e.target.value)} error={error} icon={<Mail className="size-4" />} />
               <Button type="submit" size="lg" loading={busy} className="w-full">Send reset link</Button>
