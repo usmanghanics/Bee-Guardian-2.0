@@ -25,6 +25,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const resolved = theme === 'system' ? (sysDark ? 'dark' : 'light') : theme
   useEffect(() => {
     document.documentElement.classList.toggle('dark', resolved === 'dark')
+    document.documentElement.classList.add('ag-experience')
   }, [resolved])
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t)
