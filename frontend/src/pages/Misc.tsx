@@ -1,12 +1,8 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router'
-import { ArrowLeft, Compass } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { Navbar } from '@/components/landing/Navbar'
-import { Footer } from '@/components/landing/Footer'
-import { ButtonLink } from '@/components/ui/button'
-import { BeeGlyph } from '@/components/ui/brand'
-import { Eyebrow } from '@/components/ui/primitives'
+import { ArrowLeft, ArrowRight, Compass } from 'lucide-react'
+import { Logo, LogoMark } from '@/components/ui/brand'
+import '@/apple-experience.css'
 
 const LEGAL = {
   privacy: {
@@ -31,54 +27,43 @@ const LEGAL = {
   },
 }
 
+function MinimalNav() {
+  return <header className="ag-simple-nav"><div className="ag-container ag-simple-nav-inner"><Logo /><Link to="/" className="ag-back-link"><ArrowLeft size={15}/> Back to Bee Guardian</Link></div></header>
+}
+
 export function Legal({ kind }: { kind: keyof typeof LEGAL }) {
   const doc = LEGAL[kind]
   useEffect(() => {
-    document.title = `${doc.title} · Bee Guardian`
-    window.scrollTo(0, 0)
-  }, [doc.title])
+    document.title = doc.title + ' · Bee Guardian'
+    window.scrollTo(0,0)
+  },[doc.title])
   return (
-    <div className="min-h-screen bg-bg">
-      <div className="bg-[#0d0c0a] pb-16 pt-36 text-bone">
-        <Navbar />
-        <div className="mx-auto max-w-3xl px-5 sm:px-8">
-          <Eyebrow className="text-bone/45">Last updated {doc.updated}</Eyebrow>
-          <h1 className="mt-4 text-[44px] font-semibold tracking-[-0.04em]">{doc.title}</h1>
-        </div>
-      </div>
-      <main className="mx-auto max-w-3xl space-y-10 px-5 py-16 sm:px-8">
-        {doc.sections.map(([h, b]) => (
-          <section key={h}>
-            <h2 className="text-[19px] font-semibold tracking-[-0.02em]">{h}</h2>
-            <p className="mt-3 text-[15.5px] leading-relaxed text-fg-2">{b}</p>
-          </section>
-        ))}
+    <div className="ag-site ag-legal">
+      <MinimalNav />
+      <main className="ag-legal-main ag-container">
+        <div className="ag-overline">Bee Guardian · Policies</div>
+        <h1>{doc.title}</h1>
+        <p className="ag-legal-date">Last updated {doc.updated}</p>
+        <div className="ag-legal-sections">{doc.sections.map(([heading,body])=><section key={heading}><h2>{heading}</h2><p>{body}</p></section>)}</div>
+        <Link to="/" className="ag-legal-return">Return to home <ArrowRight size={16}/></Link>
       </main>
-      <Footer />
+      <footer className="ag-footer"><div className="ag-container">© {new Date().getFullYear()} Bee Guardian. Local prototype.</div></footer>
     </div>
   )
 }
 
 export function NotFound() {
-  useEffect(() => {
-    document.title = 'Page not found · Bee Guardian'
-  }, [])
+  useEffect(()=>{document.title='Page not found · Bee Guardian'},[])
   return (
-    <div className="relative grid min-h-[100svh] place-items-center overflow-hidden bg-bg px-5">
-      <div className="absolute inset-0 bg-honeycomb opacity-40 [mask-image:radial-gradient(50%_50%_at_50%_50%,black,transparent)]" />
-      <div className="relative text-center">
-        <motion.div animate={{ x: [0, 30, -20, 0], y: [0, -16, 8, 0], rotate: [0, 12, -8, 0] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }} className="mx-auto w-24">
-          <BeeGlyph className="text-fg" />
-        </motion.div>
-        <Eyebrow className="mt-8 block">Error 404</Eyebrow>
-        <h1 className="mt-3 text-[40px] font-semibold tracking-[-0.04em]">This bee wandered off.</h1>
-        <p className="mx-auto mt-3 max-w-[40ch] text-[15px] text-fg-2">The page you’re looking for doesn’t exist or has moved.</p>
-        <div className="mt-8 flex justify-center gap-3">
-          <ButtonLink to="/" variant="secondary"><ArrowLeft className="ico ico-nudge size-4" /> Home</ButtonLink>
-          <ButtonLink to="/app" variant="primary"><Compass className="ico ico-spin size-4" /> Dashboard</ButtonLink>
-        </div>
-        <p className="mt-10 text-[12.5px] text-fg-3">Lost? <Link to="/#faq" className="underline underline-offset-2">Read the FAQ</Link></p>
-      </div>
+    <div className="ag-site ag-notfound">
+      <MinimalNav />
+      <main className="ag-notfound-main">
+        <div className="ag-notfound-graphic" aria-hidden><div className="ag-notfound-ring"><LogoMark className="size-20"/></div></div>
+        <div className="ag-overline">404 · Page not found</div>
+        <h1>Looks like this path<br/>isn't in the hive.</h1>
+        <p>The page may have moved or the address may be incorrect. Here's a simple way back.</p>
+        <div className="ag-notfound-actions"><Link to="/" className="ag-pill ag-pill-gold"><ArrowLeft size={16}/> Back to homepage</Link><Link to="/app" className="ag-pill ag-pill-dark"><Compass size={16}/> Dashboard</Link></div>
+      </main>
     </div>
   )
 }
